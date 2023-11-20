@@ -1,0 +1,82 @@
+@import './_variables.scss';
+
+body,
+html {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  scroll-behavior: smooth;
+  background-color: #f8f9fa !important;
+}
+
+// font
+.fw_500 {
+  font-weight: 500;
+}
+
+@for $i from 11 through 20 {
+  .fs_#{$i} {
+    font-size: #{$i}px;
+  }
+}
+
+//  input
+::-webkit-scrollbar {
+  width: 5px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background-color: #ebebeb;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  background: $purple;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+input:-webkit-autofill::first-line,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: var(--slate_gray) !important;
+}
+
+.cursor_pointer {
+  cursor: pointer;
+}
+
+// btns
+
+.common_btn {
+  background: $purple !important;
+  &:hover {
+    transition: all ease-in-out 0.4s;
+    border: 1px solid $purple;
+    background: transparent !important;
+    color: $purple !important;
+  }
+}
+
+.form-control {
+  min-height: 45px;
+  &:focus {
+    border: 1px solid $purple !important;
+    color: $slate-gray !important;
+  }
+}
+
+// colors
+.slate_gray {
+  color: $slate-gray;
+}
+
+.blue_dark {
+  color: $blue-dark;
+}
