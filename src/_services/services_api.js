@@ -8,3 +8,12 @@ export async function getLogin(params) {
     return null;
   }
 }
+
+export async function getPressReleasesList(params) {
+  try {
+    const response = await fetcher('GET', process.env.PRESS_RELEASES_LIST_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}

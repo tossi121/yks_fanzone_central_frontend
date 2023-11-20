@@ -14,7 +14,7 @@
     .dropdown-item {
       &:hover {
         background: #f1f3f5 !important;
-        color: $purple;
+        color: $purple !important;
       }
     }
   }
@@ -28,13 +28,13 @@
     padding: 13px 8px;
     &:hover {
       transition: all ease-in-out 0.3s;
-      background: $purple;
-      color: #fff;
+      background: $purple !important;
+      color: #fff !important;
     }
   }
   .active {
-    background: $purple;
-    color: #fff;
+    background: $purple !important;
+    color: #fff !important;
   }
 }
 
@@ -42,6 +42,7 @@
   width: 30px;
   height: 30px;
   right: -13px;
+  top: -8px;
 }
 
 .sidebar_sm {

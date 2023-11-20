@@ -23,7 +23,7 @@ function SidebarLink({ href, label, iconSrc }) {
     <>
       <li className="my-3">
         <Link href={href}>
-          <div className={`fw_500 side_link slate_gray rounded-2 ${isActive}`}>
+          <div className={`fw-medium side_link slate_gray rounded-2 ${isActive}`}>
             <FontAwesomeIcon icon={iconSrc} width={21} height={21} className="me-3" />
             {<span className="text-nowrap">{label}</span>}
           </div>

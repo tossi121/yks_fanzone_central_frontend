@@ -30,7 +30,6 @@ function Login() {
         password: formValues.password,
       };
       const res = await getLogin(params);
-      console.log(res, 'res');
       if (res.status) {
         const token = res.data.accessToken;
         Cookies.set('yks_fanzone_central_token', token.access_token, { expires: 30, path: '/' });
@@ -88,7 +87,7 @@ function Login() {
                       <Form autoComplete="off" onSubmit={handleLogin}>
                         <div className="mb-3">
                           <Form.Group>
-                            <Form.Label className="blue_dark fw_500">Enter Email Address</Form.Label>
+                            <Form.Label className="blue_dark fw-medium">Enter Email Address</Form.Label>
                             <Form.Control
                               type="text"
                               placeholder="Enter Your Email Address"
@@ -102,7 +101,7 @@ function Login() {
                         </div>
                         <div className="mb-4">
                           <Form.Group>
-                            <Form.Label className="blue_dark fw_500">Enter Password</Form.Label>
+                            <Form.Label className="blue_dark fw-medium">Enter Password</Form.Label>
                             <Form.Control
                               type="password"
                               placeholder="Enter Your Password"

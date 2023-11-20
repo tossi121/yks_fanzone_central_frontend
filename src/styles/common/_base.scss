@@ -8,9 +8,6 @@ html {
 }
 
 // font
-.fw_500 {
-  font-weight: 500;
-}
 
 @for $i from 11 through 20 {
   .fs_#{$i} {
@@ -76,11 +73,17 @@ a {
   }
 }
 
+select {
+  outline: unset !important;
+}
 // colors
 .slate_gray {
-  color: $slate-gray;
+  color: $slate-gray !important;
 }
 
 .blue_dark {
-  color: $blue-dark;
+  color: $blue-dark !important;
+}
+.bg_pruple {
+  background: $purple !important;
 }

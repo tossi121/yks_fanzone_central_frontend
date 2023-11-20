@@ -11,6 +11,10 @@ const nextConfig = {
   env: {
     BASE_API_URL: 'http://localhost:7011/',
     LOGIN_DATA: 'login',
+    PRESS_RELEASES_LIST_DATA: 'admin/pressreleases',
+    PRESS_RELEASES_ADD_DATA: 'admin/addpressreleases',
+    PRESS_RELEASES_UPDATE_DATA: 'admin/pressreleases',
+    PRESS_RELEASES_DELETE_DATA: 'admin/deletepressrelease',
   },
 };
 
