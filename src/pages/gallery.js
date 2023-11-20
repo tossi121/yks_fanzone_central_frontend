@@ -1,10 +1,11 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-const PressRelease = dynamic(import('@/components/PressRelease'));
+const Gallery = dynamic(import('@/components/Gallery'));
 
 function DefaultPage() {
-  return <PressRelease />;
+  return <Gallery />;
 }
+
 DefaultPage.layout = 'DashboardLayout';
 export default DefaultPage;

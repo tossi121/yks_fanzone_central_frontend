@@ -1,0 +1,61 @@
+.top_bar {
+  height: 65px;
+  z-index: 1;
+  .toggle_btn {
+    top: 20%;
+  }
+  .dropdown {
+    &:hover {
+      color: $purple !important;
+    }
+    span:hover {
+      color: $purple !important;
+    }
+    .dropdown-item {
+      &:hover {
+        background: #f1f3f5 !important;
+        color: $purple;
+      }
+    }
+  }
+}
+
+.sidebar_section {
+  z-index: 1;
+  width: 250px;
+  transition: all ease-in-out 0.3s;
+  .side_link {
+    padding: 13px 8px;
+    &:hover {
+      transition: all ease-in-out 0.3s;
+      background: $purple;
+      color: #fff;
+    }
+  }
+  .active {
+    background: $purple;
+    color: #fff;
+  }
+}
+
+.btn_expanded {
+  width: 30px;
+  height: 30px;
+  right: -13px;
+}
+
+.sidebar_sm {
+  width: 70px;
+  transition: all ease-in-out 0.3s;
+}
+
+.content_section {
+  transition: all ease-in-out 0.3s;
+  width: calc(100% - 280px);
+  min-height: calc(100vh - 66px);
+  max-height: 100%;
+}
+
+.content_sm {
+  width: calc(100% - 70px);
+}

@@ -1,20 +1,69 @@
+import { validEmail } from '@/_helper/regex';
+import { getLogin } from '@/_services/services_api';
+import Cookies from 'js-cookie';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Toaster, toast } from 'react-hot-toast';
 
 function Login() {
+  const router = useRouter();
   const [formValues, setFormValues] = useState({ email: '', password: '' });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
-    setFormErrors({ ...formErrors, [name]: '' });
+    setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
+    setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const errors = formValidation(formValues);
+    setFormErrors(errors);
+    setLoading(true);
+    if (Object.keys(errors).length === 0) {
+      const params = {
+        email: formValues.email,
+        password: formValues.password,
+      };
+      const res = await getLogin(params);
+      console.log(res, 'res');
+      if (res.status) {
+        const token = res.data.accessToken;
+        Cookies.set('yks_fanzone_central_token', token.access_token, { expires: 30, path: '/' });
+        router.push('/');
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    }
+    setLoading(false);
+  };
+
+  const formValidation = (values) => {
+    const errors = {};
+
+    if (!values.email) {
+      errors.email = 'Please enter an email address';
+    } else if (!validEmail(values.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (!values.password) {
+      errors.password = 'Please enter a password';
+    } else if (values.password.length < 6) {
+      errors.password = 'Password length should be at least 6 characters';
+    }
+
+    return errors;
   };
 
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       <section className="login_section min-vh-100 d-flex align-items-center justify-content-center">
         <Container>
           <Row className="justify-content-center">
@@ -36,7 +85,7 @@ function Login() {
                         <h3 className="blue_dark fw-semibold mb-0">Welcome to</h3>
                         <h2 className="blue_dark fw-bold">YKS Fanzone Central</h2>
                       </div>
-                      <Form autoComplete="off">
+                      <Form autoComplete="off" onSubmit={handleLogin}>
                         <div className="mb-3">
                           <Form.Group>
                             <Form.Label className="blue_dark fw_500">Enter Email Address</Form.Label>
@@ -48,7 +97,7 @@ function Login() {
                               value={formValues.email.replace(/\s+/g, '')}
                               onChange={handleChange}
                             />
-                            {formErrors.email && <p className="text-danger fs_14">{formErrors.email}</p>}
+                            {formErrors.email && <p className="text-danger fs_13 mt-1">{formErrors.email}</p>}
                           </Form.Group>
                         </div>
                         <div className="mb-4">
@@ -62,7 +111,7 @@ function Login() {
                               value={formValues.password.replace(/\s+/g, '')}
                               onChange={handleChange}
                             />
-                            {formErrors.password && <p className="text-danger fs_14">{formErrors.password}</p>}
+                            {formErrors.password && <p className="text-danger fs_13 mt-1">{formErrors.password}</p>}
                           </Form.Group>
                         </div>
 
