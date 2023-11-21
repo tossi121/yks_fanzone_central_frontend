@@ -18,6 +18,17 @@
     }
   }
 }
+.search_input-box {
+  right: 130px;
+  top: 23px;
+  input {
+    min-height: 38px !important;
+  }
+  .search_icon {
+    right: 8%;
+    top: 32%;
+  }
+}
 
 .pagination_container {
   &.dots:hover {
@@ -61,5 +72,24 @@
         cursor: default;
       }
     }
+  }
+}
+
+.action_btn {
+  .fa-pen-to-square:hover {
+    color: #198754 !important;
+    transition: all ease-in-out 0.3s;
+  }
+
+  .fa-trash:hover {
+    color: #dc3545 !important;
+    transition: all ease-in-out 0.3s;
+  }
+}
+
+@media (max-width: 520px) {
+  .search_input-box {
+    right: unset !important;
+    position: relative !important;
   }
 }

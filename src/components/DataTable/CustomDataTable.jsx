@@ -222,7 +222,6 @@ function CustomDataTable(props) {
                 cols.map((col, index) => {
                   // Extract the field from the column
                   const field = col['field'];
-
                   // Use optional chaining to get the render function
                   const colRender = entity?.columns?.render?.[field];
 
@@ -231,7 +230,6 @@ function CustomDataTable(props) {
 
                   // Get the value from the row
                   const fieldValue = row[field];
-
                   // Check if the fieldValue is null, undefined, or an empty string and display 'N/A' in those cases
                   const displayValue =
                     fieldValue == null || fieldValue === undefined || fieldValue === '' ? 'N/A' : fieldValue;
@@ -239,9 +237,11 @@ function CustomDataTable(props) {
                   const finalValue = colRender ? colRender(fieldValue, row, field) : displayValue;
 
                   return (
-                    <td key={index} className={`${alignClass} fs_13 blue_dark fw-medium`}>
-                      {finalValue}
-                    </td>
+                    <>
+                      <td key={index} className={`${alignClass} fs_13 blue_dark fw-medium`}>
+                        {finalValue}
+                      </td>
+                    </>
                   );
                 })}
             </tr>
@@ -254,10 +254,10 @@ function CustomDataTable(props) {
   function selectBox() {
     return (
       <>
-        <div className="form-group me-4 fs_14 fw-medium slate_gray">
+        <div className="form-group me-4 fs_14 fw-medium slate_gray mb-3 mb-sm-0">
           Show{' '}
           <select
-            className="border rounded-1 cursor_pointer px-2 py-1 mx-1"
+            className="border rounded-1 cursor_pointer px-2 py-1 mx-1 slate_gray"
             defaultValue={10}
             onChange={(e) => setCurrentPageSize((e.target.value == -1 && rows?.length) || e.target.value)}
           >
@@ -278,34 +278,41 @@ function CustomDataTable(props) {
   return (
     <>
       {(loading && <TableLoader />) || (
-        <div className="position-relative">
-          {/* <div className="d-flex justify-content-between">
+        <div>
+          <div className="d-flex justify-content-end position-absolute search_input-box">
             {rows?.length >= 1 && entity && (
               <>
                 {entity?.search && (
-                  <div className="search-input-box position-relative mb-2">
+                  <>
                     {(!searchInput && (
-                      <FontAwesomeIcon icon={faSearch} className="base-link-color position-absolute search-icon" />
+                      <FontAwesomeIcon
+                        icon={faSearch}
+                        width={18}
+                        height={18}
+                        className="slate_gray position-absolute search_icon"
+                      />
                     )) || (
                       <FontAwesomeIcon
                         icon={faTimes}
-                        className="base-link-color position-absolute search-icon"
+                        width={18}
+                        height={18}
+                        className="slate_gray position-absolute search_icon"
                         onClick={() => setSearchInput('')}
                       />
                     )}
                     <Form.Control
                       type="text"
-                      className="form-control fs-14 shadow-none p-1 bg-transparent form-search-input"
+                      className="form-control fs_14 shadow-none"
                       placeholder="Search"
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                     />
-                  </div>
+                  </>
                 )}
               </>
             )}
-          </div> */}
-          <div className="common_table text-nowrap">
+          </div>
+          <div className="common_table text-nowrap mt-3">
             <Table responsive bordered>
               {cols?.length > 0 && entity && renderTableColumns()}
               {(currentData?.length > 0 && renderTableRows()) || (
@@ -317,45 +324,38 @@ function CustomDataTable(props) {
               )}
             </Table>
           </div>
-          <Row className="align-items-center my-3 pagination-box justify-content-between">
-            <Col className="fs_14 pt-2 pt-md-0 mb-2 mb-lg-0">
-              <div className="m-auto w-max-content ms-md-0">
-                {currentData.length > 0 && entity?.info && (
-                  <>
-                    {(rows?.length > 10 && (
-                      <p className="mb-0 fw-medium slate_gray">
-                        Showing {numFirst} to{' '}
-                        <span className="fw-medium slate_gray">
-                          {(numData > currentData.length && numFirst == 1 && currentData.length) || numData}{' '}
-                        </span>
-                        of {filterData.length} entries
-                      </p>
-                    )) || (
-                      <p className="mb-0 fw-medium slate_gray">
-                        Showing {numFirst} to <span className="fw-medium slate_gray">{currentData.length}</span> of{' '}
-                        {filterData.length} entries
-                      </p>
-                    )}
-                  </>
+          <div className="align-items-center justify-content-lg-between justify-content-center d-flex flex-wrap">
+            {currentData.length > 0 && entity?.info && (
+              <>
+                {(rows?.length > 10 && (
+                  <p className="mb-lg-0 mt-sm-0 mt-3 fw-medium slate_gray fs_14">
+                    Showing {numFirst} to{' '}
+                    <span className="fw-medium slate_gray">
+                      {(numData > currentData.length && numFirst == 1 && currentData.length) || numData}{' '}
+                    </span>
+                    of {filterData.length} entries
+                  </p>
+                )) || (
+                  <p className="mb-0 fw-medium slate_gray">
+                    Showing {numFirst} to <span className="fw-medium slate_gray">{currentData.length}</span> of{' '}
+                    {filterData.length} entries
+                  </p>
                 )}
-              </div>
-            </Col>
-            {entity?.pagination && (
-              <Col>
-                <div className="w-max-content m-auto me-sm-0 d-flex align-items-center justify-content-md-end mt-md-0 mt-3">
-                  {rows?.length >= 1 && <>{entity?.lengthChange && selectBox()}</>}
-                  <CustomPagination
-                    className="pagination-bar p-0 d-flex align-items-center"
-                    data={filterData}
-                    pageSize={Number(currentPageSize)}
-                    setCurrentData={setCurrentData}
-                    setNumData={setNumData}
-                    setNumFirst={setNumFirst}
-                  />
-                </div>
-              </Col>
+              </>
             )}
-          </Row>
+            {entity?.pagination && (
+              <div className="d-flex flex-wrap justify-content-sm-start justify-content-center">
+                {rows?.length >= 1 && <>{entity?.lengthChange && selectBox()}</>}
+                <CustomPagination
+                  data={filterData}
+                  pageSize={Number(currentPageSize)}
+                  setCurrentData={setCurrentData}
+                  setNumData={setNumData}
+                  setNumFirst={setNumFirst}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

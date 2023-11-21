@@ -8,7 +8,7 @@ const Topbar = dynamic(import('./Topbar'));
 
 function DashboardLayout(props) {
   const { children } = props;
-  const [toggle, setToggle] = useState(false);
+  const [toggle, setToggle] = useState(true);
 
   function handleToggle() {
     setToggle(!toggle);

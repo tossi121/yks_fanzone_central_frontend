@@ -1,10 +1,12 @@
-import React from 'react';
-import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
-const PressRelease = dynamic(import('@/components/PressRelease'));
+export default function Home() {
+  const router = useRouter();
 
-function DefaultPage() {
-  return <PressRelease />;
+  useEffect(() => {
+    router.push('/press-release');
+  }, [router]);
+
+  return <></>;
 }
-DefaultPage.layout = 'DashboardLayout';
-export default DefaultPage;

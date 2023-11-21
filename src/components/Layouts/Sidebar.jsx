@@ -2,11 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faImages, faNewspaper } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faImages, faNewspaper, faUser, faUserFriends } from '@fortawesome/free-solid-svg-icons';
 
 const links = [
-  { href: '/', label: 'Press Release', iconSrc: faNewspaper },
+  { href: '/press-release', label: 'Press Release', iconSrc: faNewspaper },
   { href: '/gallery', label: 'Gallery', iconSrc: faImages },
+  { href: '/player-profile', label: 'Player Profile', iconSrc: faUserFriends },
+  { href: '/user-access', label: 'User Access', iconSrc: faUser },
 ];
 
 function SidebarLink({ href, label, iconSrc }) {

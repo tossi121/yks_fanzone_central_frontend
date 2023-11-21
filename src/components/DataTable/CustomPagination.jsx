@@ -70,8 +70,7 @@ const CustomPagination = (props) => {
     <>
       <div className="d-flex align-items-baseline">
         <ul
-          className="pagination_container
-      pagination-bar p-0 d-flex align-items-center justify-content-center m-auto mt-1 mt-md-0 list-unstyled"
+          className="pagination_container d-flex align-items-center justify-content-center mb-0 list-unstyled"
         >
           <li
             className={`pagination_item ${(currentPage === 1 && 'disabled') || ''}`}

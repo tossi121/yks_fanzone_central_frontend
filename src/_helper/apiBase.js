@@ -8,7 +8,7 @@ function generateHeaders(contentType = 'application/json') {
     'Content-Type': contentType,
   };
 
-  const token = Cookies.get('yuva_kabaddi_token');
+  const token = Cookies.get('yks_fanzone_central_token');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }

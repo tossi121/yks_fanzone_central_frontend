@@ -92,7 +92,7 @@ function Login() {
                               type="text"
                               placeholder="Enter Your Email Address"
                               name="email"
-                              className="shadow-none fs_14 slate_gray py-2 px-2 px-md-3"
+                              className="shadow-none fs_14 slate_gray"
                               value={formValues.email.replace(/\s+/g, '')}
                               onChange={handleChange}
                             />
@@ -106,7 +106,7 @@ function Login() {
                               type="password"
                               placeholder="Enter Your Password"
                               name="password"
-                              className="shadow-none fs_14 slate_gray py-2 px-2 px-md-3"
+                              className="shadow-none fs_14 slate_gray"
                               value={formValues.password.replace(/\s+/g, '')}
                               onChange={handleChange}
                             />
