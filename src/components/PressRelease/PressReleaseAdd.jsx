@@ -1,13 +1,14 @@
 import { addPressRelease, geTournamentList } from '@/_services/services_api';
-import { faCloudUpload, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCloudUpload, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
@@ -18,9 +19,11 @@ function PressReleaseAdd() {
   const [loading, setLoading] = useState(false);
   const [tournamentName, setTournamentName] = useState([]);
   const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [pdfFile, setPdfFile] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  const [pdfFilePreview, setPdfFilePreview] = useState(null);
+  const [thumbnail, setThumbnail] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfPreview, setPdfPreview] = useState(null);
+  const [pdf, setPdf] = useState(null);
   const [publishDate, setPublishDate] = useState(null);
   const router = useRouter();
 
@@ -34,6 +37,12 @@ function PressReleaseAdd() {
     }
   }, [thumbnailFile]);
 
+  useEffect(() => {
+    if (pdfFile) {
+      uploadPdfFile();
+    }
+  }, [pdfFile]);
+
   const handleTournamentList = async (e) => {
     const res = await geTournamentList();
     if (res?.status) {
@@ -41,25 +50,32 @@ function PressReleaseAdd() {
       setTournamentName(data);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const params = {
-      title: formValues.title,
-      thumbnail: 'https://examwwpdle.com/thumbnail.jpg',
-      pdfFile: 'https://exampwdle.com/press_release.pdf',
-      edition: formValues.edition,
-      publishDate: moment(publishDate).format('YYYY-MM-DD'),
-      status: formValues.status,
-    };
+    const errors = formValidation(formValues);
+    setFormErrors(errors);
+    setLoading(true);
+    if (Object.keys(errors).length === 0) {
+      const params = {
+        title: formValues.title,
+        thumbnail: thumbnail,
+        pdfFile: pdf,
+        edition: formValues.edition,
+        publishDate: moment(publishDate).format('YYYY-MM-DD'),
+        status: formValues.status,
+      };
 
-    const res = await addPressRelease(params);
+      const res = await addPressRelease(params);
 
-    if (res?.status) {
-      toast.success(res.message);
-      router.push('/');
-    } else {
-      toast.error(res?.message);
+      if (res?.status) {
+        toast.success(res.message);
+        router.push('/');
+      } else {
+        toast.error(res?.message);
+      }
     }
+    setLoading(false);
   };
 
   const handleChange = (e) => {
@@ -68,60 +84,108 @@ function PressReleaseAdd() {
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
-  const handleThumbnailFile = (e) => {
-    if (e && e.target && e.target.files) {
-      const file = e.target.files[0];
-      if (file) {
-        setThumbnailFile(file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setThumbnailPreview(e.target.result);
-        };
-        reader.readAsDataURL(file);
+  const uploadThumbnailFile = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('folderName', 'yks/thumbnail');
+      formData.append('files', thumbnailFile);
+
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
+      };
+
+      const response = await axios.post(
+        `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
+        formData,
+        { headers }
+      );
+
+      if (response?.data?.status) {
+        setTimeout(() => {
+          setThumbnail(response?.data?.result[0]);
+        }, 500);
       }
+    } catch (error) {
+      console.error('Error uploading thumbnail file:', error);
     }
   };
 
-  const handlePdfFile = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPdfFile(file);
+  const handleThumbnailFile = (e) => {
+    const file = e.target.files?.[0];
 
+    if (file) {
+      setThumbnailFile(file);
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setPdfFilePreview(e.target.result);
+      reader.onload = (event) => {
+        setThumbnailPreview(event.target.result);
       };
 
       reader.readAsDataURL(file);
     }
   };
 
-  const uploadThumbnailFile = async (e) => {
-    if (thumbnailFile) {
-      const params = {
-        folderName: 'yks/thumbnail',
-        files: thumbnailFile,
-      };
-      const _headers = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
-        },
-      };
+  const uploadPdfFile = async () => {
+    try {
       const formData = new FormData();
-      Object.keys(params).forEach((key) => formData.append(key, params[key]));
+      formData.append('folderName', 'yks/pdf');
+      formData.append('files', pdfFile);
+
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
+      };
+
       const response = await axios.post(
         `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
         formData,
-        _headers
+        { headers }
       );
-      console.log(thumbnailFile);
+
       if (response?.data?.status) {
         setTimeout(() => {
-          setThumbnailFile(response?.data?.result[0]);
+          setPdf(response?.data?.result[0]);
         }, 500);
       }
+    } catch (error) {
+      console.error('Error uploading thumbnail file:', error);
     }
+  };
+
+  const handlePdfFile = (e) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      setPdfFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPdfPreview(event.target.result);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const formValidation = (values) => {
+    const errors = {};
+
+    if (!values.title) {
+      errors.title = 'Please enter a title ';
+    }
+    if (!values.edition) {
+      errors.edition = 'Please select a edition';
+    }
+    if (!publishDate) {
+      errors.publishDate = 'Please select a publish date';
+    }
+    if (!thumbnailFile) {
+      errors.thumbnailFile = 'Please upload a thumbnail ';
+    }
+    if (!pdfFile) {
+      errors.pdfFile = 'Please upload a pdf ';
+    }
+
+    return errors;
   };
 
   return (
@@ -129,7 +193,11 @@ function PressReleaseAdd() {
       <Container fluid>
         <Row>
           <Col>
-            <Card className="bg-white">
+            <Link href={'/press-release'} className="slate_gray">
+              <FontAwesomeIcon icon={faArrowLeft} width={15} height={15} className="me-2" />
+              Back
+            </Link>
+            <Card className="bg-white mt-3">
               <Card.Body className="p-4">
                 <div className="d-flex justify-content-between align-items-center">
                   <h4 className="fw-bold mb-0">Add Press Releases</h4>
@@ -182,7 +250,6 @@ function PressReleaseAdd() {
                           showYearDropdown
                           dropdownMode="select"
                           selected={publishDate}
-                          minDate={new Date()}
                           onChange={(date) => setPublishDate(date)}
                           placeholderText="Select Publish Date"
                           showTimeSelect={false}
@@ -190,6 +257,7 @@ function PressReleaseAdd() {
                           className="shadow-none fs_14 slate_gray"
                           onKeyDown={(e) => e.preventDefault()}
                         />
+                        {formErrors.publishDate && <p className="text-danger fs_13 mt-1">{formErrors.publishDate}</p>}
                       </div>
                     </Col>
 
@@ -224,18 +292,18 @@ function PressReleaseAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {thumbnailPreview && (
+                          {(thumbnailPreview && (
                             <Image
                               src={thumbnailPreview}
                               alt="thumbnail"
-                              width={150}
                               height={150}
-                              className="img-fluid rounded-3 mb-3"
+                              width={150}
+                              className="rounded-3 mb-2"
                             />
-                          )}
-                          {thumbnailPreview == null && (
-                            <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
-                          )}
+                          )) ||
+                            (thumbnailPreview == null && (
+                              <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
+                            ))}
                           <div>
                             <Form.Control
                               type="file"
@@ -255,7 +323,7 @@ function PressReleaseAdd() {
                           <span className="fs_13 mt-2 slate_gray">800px width x 533px height</span>
                         </div>
                         {formErrors.thumbnailFile && (
-                          <p className="text-danger fs-14 error-message">{formErrors.thumbnailFile}</p>
+                          <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
                         )}
                       </div>
                     </Col>
@@ -263,16 +331,12 @@ function PressReleaseAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload PDF File</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {pdfFilePreview && (
-                            <Image
-                              src={pdfFilePreview}
-                              alt="pdfFile"
-                              width={150}
-                              height={150}
-                              className="img-fluid rounded-3"
-                            />
+                          {(pdfPreview && (
+                            <Image src={'/images/pdf.png'} alt="pdfFile" width={70} height={70} className="rounded-3" />
+                          )) || (
+                            <FontAwesomeIcon icon={faCloudUpload} className="slate_gray mb-3" width={35} height={35} />
                           )}
-                          <FontAwesomeIcon icon={faCloudUpload} className="slate_gray mb-3" width={35} height={35} />
+
                           <div>
                             <Form.Control
                               type="file"
@@ -291,15 +355,14 @@ function PressReleaseAdd() {
                             </label>
                           </div>
                         </div>
-                        {formErrors.pdfFileFile && (
-                          <p className="text-danger fs-14 error-message">{formErrors.pdfFileFile}</p>
-                        )}
+                        {formErrors.pdfFile && <p className="text-danger fs_13 mt-1">{formErrors.pdfFile}</p>}
                       </div>
                     </Col>
 
                     <Col lg={6}>
-                      <Button variant="" type="submit" className="common_btn text-white px-4">
+                      <Button variant="" className="px-4 text-white common_btn" disabled={loading} type="submit">
                         Publish
+                        {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>
                     </Col>
                   </Row>

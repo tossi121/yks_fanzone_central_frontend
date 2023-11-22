@@ -54,9 +54,10 @@ export async function deletePressRelease(params) {
   }
 }
 
-export async function updatePressRelease(params) {
+export async function updatePressRelease(id, params) {
   try {
-    const response = await fetcher('POST', process.env.PRESS_RELEASES_DATA, params);
+    const url = `${process.env.PRESS_RELEASES_DATA}/${id}`;
+    const response = await fetcher('POST', url, params);
     return response;
   } catch (err) {
     return null;

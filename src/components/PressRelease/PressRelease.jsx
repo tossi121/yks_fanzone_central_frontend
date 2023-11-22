@@ -21,6 +21,7 @@ function PressRelease() {
     { heading: 'Title', field: 'title' },
     { heading: 'Update By', field: 'update_by' },
     { heading: 'Updated Date', field: 'updatedAt' },
+    { heading: 'Publish Date', field: 'publishDate' },
     { heading: 'Status', field: 'status' },
     { heading: 'Action', field: 'action', align: 'center' },
   ];
@@ -29,6 +30,7 @@ function PressRelease() {
     columns: {
       render: {
         updatedAt: renderDate,
+        publishDate: renderPublishDate,
         status: renderSatus,
         action: renderActions,
       },
@@ -66,7 +68,11 @@ function PressRelease() {
   }
 
   function renderDate(value, row) {
-    return <span>{moment(row.Date).format('DD-MMMM-YYYY')} </span>;
+    return <span>{moment(row.updatedAt).format('DD-MMMM-YYYY')} </span>;
+  }
+
+  function renderPublishDate(value, row) {
+    return <span>{moment(row.publishDate).format('DD-MMMM-YYYY')} </span>;
   }
 
   function renderSatus(value, row) {

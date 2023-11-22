@@ -73,8 +73,8 @@ a {
     color: $slate-gray !important;
   }
 }
-.form-check-inline{
-  .form-check-label{
+.form-check-inline {
+  .form-check-label {
     cursor: pointer;
   }
 }
@@ -85,6 +85,10 @@ select {
 .file_upload {
   border: 2px dashed $slate-gray;
   height: 250px;
+  img {
+    object-fit: contain;
+    height: 100px;
+  }
 }
 // colors
 .slate_gray {
