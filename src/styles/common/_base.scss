@@ -81,7 +81,9 @@ a {
 select {
   outline: unset !important;
 }
-
+.textarea_description {
+  height: 250px !important;
+}
 .file_upload {
   border: 2px dashed $slate-gray;
   height: 250px;
@@ -101,6 +103,7 @@ select {
 .bg_pruple {
   background: $purple !important;
 }
+
 
 // date
 

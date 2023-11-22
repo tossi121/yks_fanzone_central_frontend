@@ -212,7 +212,11 @@ function PressReleaseEdit({ id }) {
       errors.publishDate = 'Please select a publish date';
     }
     if (!thumbnailFile) {
-      errors.thumbnailFile = 'Please upload a thumbnail ';
+      errors.thumbnailFile = 'Please upload a thumbnail';
+    } else {
+      if (thumbnailFile.size > 1024 * 1024) {
+        errors.thumbnailFile = 'File size should be 1 MB or less';
+      }
     }
     if (!pdfFile) {
       errors.pdfFile = 'Please upload a pdf ';
