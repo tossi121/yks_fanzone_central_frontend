@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import { Col, Form, Row, Table } from 'react-bootstrap';
-import TableLoader from './TableLoader';
-import { useRouter } from 'next/router';
+import { Form, Table } from 'react-bootstrap';
 
 const CustomPagination = dynamic(import('./CustomPagination'));
 
@@ -31,7 +29,6 @@ function CustomDataTable(props) {
   const [searchInput, setSearchInput] = useState('');
   const [sortingBy, setSortingBy] = useState('');
   const [sortType, setSortType] = useState('');
-  const [loading, setLoading] = useState(false);
   const [entity, setEntities] = useState(Object.assign({}, defaultProps, options));
 
   const cellClasses = {
@@ -39,20 +36,6 @@ function CustomDataTable(props) {
     center: 'text-center',
     right: 'text-end',
   };
-
-  // useEffect(() => {
-  //   if (rows?.length === 0) {
-  //     setLoading(true);
-
-  //     const timeoutId = setTimeout(() => {
-  //       setLoading(false);
-  //     }, 400);
-
-  //     return () => clearTimeout(timeoutId);
-  //   } else {
-  //     setLoading(false);
-  //   }
-  // }, [rows]);
 
   useEffect(() => {
     if (entity) {
@@ -176,7 +159,7 @@ function CustomDataTable(props) {
               return (
                 <th
                   key={key}
-                  className={`fs_14 text-white text-capitalize bg_pruple ${
+                  className={`fs_14 text-white text-capitalize bg_purple ${
                     entity?.sorting && col.heading !== 'Action' ? 'cursor_pointer' : ''
                   }   
                   ${(col?.align && cellClasses[col.align]) || 'text-left'}
@@ -277,87 +260,85 @@ function CustomDataTable(props) {
 
   return (
     <>
-      {(loading && <TableLoader />) || (
-        <div>
-          <div className="d-flex justify-content-end position-absolute search_input-box">
-            {rows?.length >= 1 && entity && (
-              <>
-                {entity?.search && (
-                  <>
-                    {(!searchInput && (
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        width={18}
-                        height={18}
-                        className="slate_gray position-absolute search_icon"
-                      />
-                    )) || (
-                      <FontAwesomeIcon
-                        icon={faTimes}
-                        width={18}
-                        height={18}
-                        className="slate_gray position-absolute search_icon"
-                        onClick={() => setSearchInput('')}
-                      />
-                    )}
-                    <Form.Control
-                      type="text"
-                      className="form-control fs_14 shadow-none"
-                      placeholder="Search"
-                      value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
+      <div>
+        <div className="d-flex justify-content-end position-absolute search_input-box">
+          {rows?.length >= 1 && entity && (
+            <>
+              {entity?.search && (
+                <>
+                  {(!searchInput && (
+                    <FontAwesomeIcon
+                      icon={faSearch}
+                      width={18}
+                      height={18}
+                      className="slate_gray position-absolute search_icon"
                     />
-                  </>
-                )}
-              </>
-            )}
-          </div>
-          <div className="common_table text-nowrap mt-3">
-            <Table responsive bordered>
-              {cols?.length > 0 && entity && renderTableColumns()}
-              {(currentData?.length > 0 && renderTableRows()) || (
-                <tbody>
-                  <tr>
-                    <td colSpan={cols?.length}>No record found!</td>
-                  </tr>
-                </tbody>
+                  )) || (
+                    <FontAwesomeIcon
+                      icon={faTimes}
+                      width={18}
+                      height={18}
+                      className="slate_gray position-absolute search_icon"
+                      onClick={() => setSearchInput('')}
+                    />
+                  )}
+                  <Form.Control
+                    type="text"
+                    className="form-control fs_14 shadow-none"
+                    placeholder="Search"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </>
               )}
-            </Table>
-          </div>
-          <div className="align-items-center justify-content-lg-between justify-content-center d-flex flex-wrap">
-            {currentData.length > 0 && entity?.info && (
-              <>
-                {(rows?.length > 10 && (
-                  <p className="mb-lg-0 mt-sm-0 mt-3 fw-medium slate_gray fs_14">
-                    Showing {numFirst} to{' '}
-                    <span className="fw-medium slate_gray">
-                      {(numData > currentData.length && numFirst == 1 && currentData.length) || numData}{' '}
-                    </span>
-                    of {filterData.length} entries
-                  </p>
-                )) || (
-                  <p className="mb-0 fw-medium slate_gray">
-                    Showing {numFirst} to <span className="fw-medium slate_gray">{currentData.length}</span> of{' '}
-                    {filterData.length} entries
-                  </p>
-                )}
-              </>
-            )}
-            {entity?.pagination && (
-              <div className="d-flex flex-wrap justify-content-sm-start justify-content-center">
-                {rows?.length >= 1 && <>{entity?.lengthChange && selectBox()}</>}
-                <CustomPagination
-                  data={filterData}
-                  pageSize={Number(currentPageSize)}
-                  setCurrentData={setCurrentData}
-                  setNumData={setNumData}
-                  setNumFirst={setNumFirst}
-                />
-              </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
-      )}
+        <div className="common_table text-nowrap mt-3">
+          <Table responsive bordered>
+            {cols?.length > 0 && entity && renderTableColumns()}
+            {(currentData?.length > 0 && renderTableRows()) || (
+              <tbody>
+                <tr>
+                  <td colSpan={cols?.length}>No record found!</td>
+                </tr>
+              </tbody>
+            )}
+          </Table>
+        </div>
+        <div className="align-items-center justify-content-lg-between justify-content-center d-flex flex-wrap">
+          {currentData.length > 0 && entity?.info && (
+            <>
+              {(rows?.length > 10 && (
+                <p className="mb-lg-0 mt-sm-0 mt-3 fw-medium slate_gray fs_14">
+                  Showing {numFirst} to{' '}
+                  <span className="fw-medium slate_gray">
+                    {(numData > currentData.length && numFirst == 1 && currentData.length) || numData}{' '}
+                  </span>
+                  of {filterData.length} entries
+                </p>
+              )) || (
+                <p className="mb-0 fw-medium slate_gray">
+                  Showing {numFirst} to <span className="fw-medium slate_gray">{currentData.length}</span> of{' '}
+                  {filterData.length} entries
+                </p>
+              )}
+            </>
+          )}
+          {entity?.pagination && (
+            <div className="d-flex flex-wrap justify-content-sm-start justify-content-center">
+              {rows?.length >= 1 && <>{entity?.lengthChange && selectBox()}</>}
+              <CustomPagination
+                data={filterData}
+                pageSize={Number(currentPageSize)}
+                setCurrentData={setCurrentData}
+                setNumData={setNumData}
+                setNumFirst={setNumFirst}
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 }

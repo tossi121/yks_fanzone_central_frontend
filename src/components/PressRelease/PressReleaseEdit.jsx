@@ -1,6 +1,8 @@
 import { updatePressRelease, geTournamentList, currentPressRelease } from '@/_services/services_api';
 import { faArrowLeft, faCloudUpload, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import moment from 'moment';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,11 +20,7 @@ function PressReleaseEdit({ id }) {
   const [loading, setLoading] = useState(false);
   const [tournamentName, setTournamentName] = useState([]);
   const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  const [thumbnail, setThumbnail] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
-  const [pdfPreview, setPdfPreview] = useState(null);
-  const [pdf, setPdf] = useState(null);
   const [publishDate, setPublishDate] = useState(null);
   const [currentPressData, setCurrentPressData] = useState(null);
   const router = useRouter();
@@ -30,7 +28,7 @@ function PressReleaseEdit({ id }) {
   useEffect(() => {
     if (pressReleaseId) {
       handleTournamentList();
-      handlecurrentPressRelease();
+      handleCurrentPressRelease();
     }
   }, [pressReleaseId]);
 
@@ -48,15 +46,12 @@ function PressReleaseEdit({ id }) {
       } else {
         console.error('Invalid date format');
       }
-      const thumbnailImg = currentPressData?.thumbnail;
-      const pdfFile = currentPressData?.pdfFile;
-      setThumbnailPreview(process.env.IMAGE_BASE + thumbnailImg);
-      setThumbnailFile(thumbnailImg);
-      setPdfFile(pdfFile);
+      setThumbnailFile(currentPressData?.thumbnail);
+      setPdfFile(currentPressData?.pdfFile);
     }
   }, [pressReleaseId, currentPressData]);
 
-  const handlecurrentPressRelease = async (e) => {
+  const handleCurrentPressRelease = async () => {
     const res = await currentPressRelease(pressReleaseId);
     if (res?.status) {
       const data = res.data;
@@ -64,19 +59,7 @@ function PressReleaseEdit({ id }) {
     }
   };
 
-  useEffect(() => {
-    if (thumbnailFile) {
-      uploadThumbnailFile();
-    }
-  }, [thumbnailFile]);
-
-  useEffect(() => {
-    if (pdfFile) {
-      uploadPdfFile();
-    }
-  }, [pdfFile]);
-
-  const handleTournamentList = async (e) => {
+  const handleTournamentList = async () => {
     const res = await geTournamentList();
     if (res?.status) {
       const data = res.data;
@@ -92,8 +75,8 @@ function PressReleaseEdit({ id }) {
     if (Object.keys(errors).length === 0) {
       const params = {
         title: formValues.title,
-        thumbnail: thumbnail || thumbnailFile,
-        pdfFile: pdf || pdfFile,
+        thumbnail: thumbnailFile,
+        pdfFile: pdfFile,
         edition: formValues.edition,
         publishDate: moment(publishDate).format('YYYY-MM-DD'),
         status: formValues.status,
@@ -117,16 +100,25 @@ function PressReleaseEdit({ id }) {
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
-  const uploadThumbnailFile = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('folderName', 'yks/thumbnail');
-      formData.append('files', thumbnailFile);
+  const createFormData = (file, folderName) => {
+    const formData = new FormData();
+    formData.append('folderName', folderName);
+    formData.append('files', file);
+    return formData;
+  };
 
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
-      };
+  const getHeaders = () => {
+    return {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
+    };
+  };
+
+  const handleUpload = async (file, setFile) => {
+    try {
+      const folderName = setFile === setThumbnailFile ? 'yks/thumbnail' : 'yks/pdf';
+      const formData = createFormData(file, folderName);
+      const headers = getHeaders();
 
       const response = await axios.post(
         `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
@@ -136,67 +128,25 @@ function PressReleaseEdit({ id }) {
 
       if (response?.data?.status) {
         setTimeout(() => {
-          setThumbnail(response?.data?.result[0]);
+          setFile(response?.data?.result[0]);
         }, 500);
       }
     } catch (error) {
-      console.error('Error uploading thumbnail file:', error);
+      console.error(`Error uploading ${setFile === setThumbnailFile ? 'thumbnail' : 'pdf'} file:`, error);
     }
   };
 
-  const handleThumbnailFile = (e) => {
-    const file = e.target.files?.[0];
-
-    if (file) {
-      setThumbnailFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setThumbnailPreview(event.target.result);
-      };
-
-      reader.readAsDataURL(file);
-    }
+  const handleFileClick = (event, setFile) => {
+    const file = event.target.files[0];
+    handleUpload(file, setFile);
   };
 
-  const uploadPdfFile = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('folderName', 'yks/pdf');
-      formData.append('files', pdfFile);
-
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
-      };
-
-      const response = await axios.post(
-        `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
-        formData,
-        { headers }
-      );
-
-      if (response?.data?.status) {
-        setTimeout(() => {
-          setPdf(response?.data?.result[0]);
-        }, 500);
-      }
-    } catch (error) {
-      console.error('Error uploading thumbnail file:', error);
-    }
+  const handleThumbnailClick = (event) => {
+    handleFileClick(event, setThumbnailFile);
   };
 
-  const handlePdfFile = (e) => {
-    const file = e.target.files?.[0];
-
-    if (file) {
-      setPdfFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setPdfPreview(event.target.result);
-      };
-
-      reader.readAsDataURL(file);
-    }
+  const handlePdfClick = (event) => {
+    handleFileClick(event, setPdfFile);
   };
 
   const formValidation = (values) => {
@@ -213,18 +163,17 @@ function PressReleaseEdit({ id }) {
     }
     if (!thumbnailFile) {
       errors.thumbnailFile = 'Please upload a thumbnail';
-    } else {
-      if (thumbnailFile.size > 1024 * 1024) {
-        errors.thumbnailFile = 'File size should be 1 MB or less';
-      }
+    } else if (thumbnailFile.size > 10 * 1024 * 1024) {
+      errors.thumbnailFile = 'File size should be 10 MB or less';
     }
+
     if (!pdfFile) {
       errors.pdfFile = 'Please upload a pdf ';
     }
 
     return errors;
   };
-  console.log(thumbnailFile);
+
   return (
     <>
       <Container fluid>
@@ -328,23 +277,28 @@ function PressReleaseEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailPreview && (
-                            <Image
-                              src={thumbnailPreview}
-                              alt="thumbnail"
-                              height={150}
-                              width={150}
-                              className="rounded-3 mb-2"
-                            />
-                          )) ||
-                            (thumbnailPreview == null && (
-                              <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
-                            ))}
+                          {(thumbnailFile && (
+                            <>
+                              <a
+                                target="_blank"
+                                className="cursor_pointer"
+                                href={process.env.IMAGE_BASE + thumbnailFile}
+                              >
+                                <Image
+                                  src={process.env.IMAGE_BASE + thumbnailFile}
+                                  alt="thumbnail"
+                                  height={150}
+                                  width={150}
+                                  className="rounded-3 mb-2"
+                                />
+                              </a>
+                            </>
+                          )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
                           <div>
                             <Form.Control
                               type="file"
                               id="thumbnail"
-                              onChange={handleThumbnailFile}
+                              onChange={handleThumbnailClick}
                               accept="image/png, image/jpeg, image/jpg, image/svg+xml"
                               className="d-none"
                               aria-describedby="thumbnail"
@@ -367,8 +321,18 @@ function PressReleaseEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Upload PDF File</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(!pdfPreview && (
-                            <Image src={'/images/pdf.png'} alt="pdfFile" width={70} height={70} className="rounded-3" />
+                          {(pdfFile && (
+                            <>
+                              <a target="_blank" className="cursor_pointer" href={process.env.IMAGE_BASE + pdfFile}>
+                                <Image
+                                  src={'/images/pdf.png'}
+                                  alt="pdfFile"
+                                  width={70}
+                                  height={70}
+                                  className="rounded-3"
+                                />
+                              </a>
+                            </>
                           )) || (
                             <FontAwesomeIcon icon={faCloudUpload} className="slate_gray mb-3" width={35} height={35} />
                           )}
@@ -377,7 +341,7 @@ function PressReleaseEdit({ id }) {
                             <Form.Control
                               type="file"
                               id="pdfFile"
-                              onChange={handlePdfFile}
+                              onChange={handlePdfClick}
                               accept=".pdf"
                               className="d-none"
                               aria-describedby="pdfFile"

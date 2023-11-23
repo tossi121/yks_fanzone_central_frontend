@@ -17,8 +17,8 @@ html {
 
 //  input
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background-color: #ebebeb;
@@ -54,7 +54,6 @@ a {
 }
 
 // btns
-
 .common_btn {
   border: 1px solid transparent !important;
   background: $purple !important;
@@ -63,6 +62,17 @@ a {
     border: 1px solid $purple !important;
     background: transparent !important;
     color: $purple !important;
+  }
+}
+
+.common_outline_btn {
+  border: 1px solid $purple !important;
+  background: #fff !important;
+  &:hover {
+    transition: all ease-in-out 0.4s;
+    border: 1px solid #fff !important;
+    background: $purple !important;
+    color: #fff !important;
   }
 }
 
@@ -100,10 +110,13 @@ select {
 .blue_dark {
   color: $blue-dark !important;
 }
-.bg_pruple {
+.bg_purple {
   background: $purple !important;
 }
 
+.purple_color {
+  color: $purple !important;
+}
 
 // date
 

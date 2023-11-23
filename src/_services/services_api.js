@@ -71,7 +71,7 @@ export async function updatePressRelease(id, params) {
 
 export async function getGalleryList(params) {
   try {
-    const response = await fetcher('GET', process.env.GALLERY_RELEASES_DATA, params);
+    const response = await fetcher('GET', process.env.GALLERY_DATA, params);
     return response;
   } catch (err) {
     return null;
@@ -80,7 +80,7 @@ export async function getGalleryList(params) {
 
 export async function addGallery(params) {
   try {
-    const response = await fetcher('POST', process.env.GALLERY_RELEASES_ADD_DATA, params);
+    const response = await fetcher('POST', process.env.GALLERY_ADD_DATA, params);
     return response;
   } catch (err) {
     return null;
@@ -89,7 +89,7 @@ export async function addGallery(params) {
 
 export async function currentGallery(id) {
   try {
-    const url = `${process.env.GALLERY_RELEASES_DATA}/${id}`;
+    const url = `${process.env.GALLERY_DATA}/${id}`;
     const response = await fetcher('GET', url);
     return response;
   } catch (err) {
@@ -99,7 +99,7 @@ export async function currentGallery(id) {
 
 export async function deleteGallery(params) {
   try {
-    const response = await fetcher('POST', process.env.GALLERY_RELEASES_DELETE_DATA, params);
+    const response = await fetcher('POST', process.env.GALLERY_DELETE_DATA, params);
     return response;
   } catch (err) {
     return null;
@@ -108,7 +108,7 @@ export async function deleteGallery(params) {
 
 export async function updateGallery(id, params) {
   try {
-    const url = `${process.env.GALLERY_RELEASES_DATA}/${id}`;
+    const url = `${process.env.GALLERY_DATA}/${id}`;
     const response = await fetcher('POST', url, params);
     return response;
   } catch (err) {

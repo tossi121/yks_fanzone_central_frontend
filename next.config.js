@@ -10,7 +10,7 @@ const nextConfig = {
   },
   env: {
     BASE_API_URL: 'http://localhost:7012/',
-    IMAGE_BASE: 'https://new-bucket-3b724d30.s3.amazonaws.com/',
+    IMAGE_BASE: 'https://d1zoo736173x95.cloudfront.net/',
     LOGIN_DATA: 'login',
     // Press Releases
     PRESS_RELEASES_DATA: 'admin/pressreleases',
@@ -20,9 +20,9 @@ const nextConfig = {
     TOURNAMENT_LIST_DATA: 'admin/getAllNamesAndIds',
 
     // Gallery
-    GALLERY_RELEASES_DATA: 'admin/getallgalleries',
-    GALLERY_RELEASES_ADD_DATA: 'admin/addgallery',
-    GALLERY_RELEASES_DELETE_DATA: 'admin/deletegallery',
+    GALLERY_DATA: 'admin/getallgalleries',
+    GALLERY_ADD_DATA: 'admin/addgallery',
+    GALLERY_DELETE_DATA: 'admin/deletegallery',
   },
 };
 

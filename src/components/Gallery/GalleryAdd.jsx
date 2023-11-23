@@ -1,36 +1,23 @@
 import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
 import Image from 'next/image';
 import { addGallery } from '@/_services/services_api';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
 
 function GalleryAdd() {
   const [formValues, setFormValues] = useState({ title: '', description: '', status: 'Published' });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  const [thumbnail, setThumbnail] = useState(null);
   const [addImageFile, setAddImageFile] = useState([]);
-  const [addImagePreview, setAddImagePreview] = useState([]);
-  const [addImage, setAddImage] = useState([]);
-
-  useEffect(() => {
-    if (thumbnailFile) {
-      uploadThumbnailFile();
-    }
-  }, [thumbnailFile]);
-
-  useEffect(() => {
-    if (addImageFile.length > 0) {
-      uploadAddImageFile();
-    }
-  }, [addImageFile]);
+  const [draft, setDraft] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,95 +25,60 @@ function GalleryAdd() {
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
-  const uploadThumbnailFile = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('folderName', 'yks/gallery-thumbnail');
-      formData.append('files', thumbnailFile);
+  const createFormData = (files, folderName) => {
+    const formData = new FormData();
+    formData.append('folderName', folderName);
 
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
-      };
-
-      const response = await axios.post(
-        `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
-        formData,
-        { headers }
-      );
-
-      if (response?.data?.status) {
-        setTimeout(() => {
-          setThumbnail(response?.data?.result[0]);
-        }, 500);
-      }
-    } catch (error) {
-      console.error('Error uploading thumbnail file:', error);
-    }
-  };
-
-  const handleThumbnailFile = (e) => {
-    const file = e.target.files?.[0];
-
-    if (file) {
-      setThumbnailFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setThumbnailPreview(event.target.result);
-      };
-
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const uploadAddImageFile = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('folderName', 'yks/gallery-images');
-      addImageFile.forEach((file) => formData.append('files', file));
-
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
-      };
-
-      const response = await axios.post(
-        `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
-        formData,
-        { headers }
-      );
-
-      if (response?.data?.status) {
-        setTimeout(() => {
-          setAddImage(response?.data?.result[0]);
-        }, 500);
-      }
-    } catch (error) {
-      console.error('Error uploading image file:', error);
-    }
-  };
-
-  const handleAddImageFile = (e) => {
-    const files = e.target.files;
-
-    if (files) {
-      const newFiles = Array.from(files);
-      setAddImageFile((prevFiles) => [...prevFiles, ...newFiles]);
-
-      newFiles.forEach((file) => {
-        readAndSetImagePreview(file);
+    if (Array.isArray(files)) {
+      files.forEach((file, index) => {
+        formData.append(`files`, file);
       });
+    } else {
+      formData.append('files', files);
+    }
+
+    return formData;
+  };
+
+  const getHeaders = () => {
+    return {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
+    };
+  };
+
+  const handleUpload = async (files, setFiles) => {
+    try {
+      const folderName = Array.isArray(files) ? 'yks/gallery-thumbnail' : 'yks/gallery-images';
+      const formData = createFormData(files, folderName);
+      const headers = getHeaders();
+
+      const response = await axios.post(
+        `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
+        formData,
+        { headers }
+      );
+
+      if (response?.data?.status) {
+        setTimeout(() => {
+          setFiles(response?.data?.result);
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
     }
   };
 
-  const readAndSetImagePreview = (file) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setAddImagePreview((prevPreviews) => [...prevPreviews, event.target.result]);
-    };
-
-    reader.readAsDataURL(file);
+  const handleThumbnailClick = (event) => {
+    const file = event.target.files[0];
+    handleUpload(file, setThumbnailFile);
   };
+
+  const handleAddImageClick = (event) => {
+    const files = Array.from(event.target.files);
+    handleUpload(files, setAddImageFile);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = formValidation(formValues);
@@ -136,20 +88,25 @@ function GalleryAdd() {
       const params = {
         name_of_group: formValues.title,
         description_of_gallery: formValues.description,
-        images: addImage,
-        thumbnailImage: thumbnail,
-        status: formValues.status,
+        images: addImageFile,
+        thumbnailImage: thumbnailFile[0],
+        status: (!draft && formValues.status) || 'Draft',
       };
 
       const res = await addGallery(params);
 
       if (res?.status) {
-        toast.success(res.message);
-        router.push('/');
+        if (draft) {
+          toast.success('Save as draft successfully');
+        } else {
+          toast.success(res.message);
+        }
+        router.push('/gallery');
       } else {
         toast.error(res?.message);
       }
     }
+
     setLoading(false);
   };
 
@@ -168,21 +125,22 @@ function GalleryAdd() {
 
     if (!thumbnailFile) {
       errors.thumbnailFile = 'Please upload a thumbnail';
-    } else if (thumbnailFile.size > 1024 * 1024) {
-      errors.thumbnailFile = 'File size should be 1 MB or less';
+    } else if (thumbnailFile.size > 10 * 1024 * 1024) {
+      errors.thumbnailFile = 'File size should be 10 MB or less';
     }
     if (addImageFile.length == 0) {
       errors.addImageFile = 'Please upload a thumbnail';
     }
 
     addImageFile.forEach((file, index) => {
-      if (file.size > 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         errors.addImageFile = `File size should be 1 MB or less`;
       }
     });
 
     return errors;
   };
+
   return (
     <>
       <Container fluid>
@@ -258,27 +216,33 @@ function GalleryAdd() {
                         </Form.Group>
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailPreview && (
-                            <Image
-                              src={thumbnailPreview}
-                              alt="thumbnail"
-                              height={500}
-                              width={500}
-                              className="rounded-3 mb-2"
-                            />
-                          )) ||
-                            (thumbnailPreview == null && (
-                              <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
-                            ))}
+                          {(thumbnailFile && (
+                            <>
+                              <a
+                                target="_blank"
+                                className="cursor_pointer"
+                                href={process.env.IMAGE_BASE + thumbnailFile}
+                              >
+                                <Image
+                                  src={process.env.IMAGE_BASE + thumbnailFile}
+                                  alt="thumbnail"
+                                  height={150}
+                                  width={150}
+                                  className="rounded-3 mb-2"
+                                />
+                              </a>
+                            </>
+                          )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
                           <div>
                             <Form.Control
                               type="file"
                               id="thumbnail"
-                              onChange={handleThumbnailFile}
+                              onChange={handleThumbnailClick}
                               accept="image/png, image/jpeg, image/jpg, image/svg+xml"
                               className="d-none"
                               aria-describedby="thumbnail"
@@ -297,21 +261,26 @@ function GalleryAdd() {
                         )}
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Upload Images</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          <div className="d-flex justify-content-center align-items-center w-100 flex-wrap h-100 gap-2 overflow-auto">
-                            {(addImagePreview.length > 0 &&
-                              addImagePreview.map((preview, index) => (
-                                <Image
-                                  key={index}
-                                  src={preview}
-                                  alt={`Preview ${index}`}
-                                  height={150}
-                                  width={150}
-                                  className="rounded-3 mb-2"
-                                />
+                          <div className="d-flex align-items-center gap-3 overflow-auto w-100 h-100 justify-content-center">
+                            {(addImageFile?.length > 0 &&
+                              addImageFile.map((preview, index) => (
+                                <>
+                                  <a target="_blank" className="cursor_pointer" href={process.env.IMAGE_BASE + preview}>
+                                    <Image
+                                      key={index}
+                                      src={process.env.IMAGE_BASE + preview}
+                                      alt={`Preview ${index}`}
+                                      height={150}
+                                      width={150}
+                                      className="rounded-3 mb-2"
+                                    />
+                                  </a>
+                                </>
                               ))) || (
                               <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
                             )}
@@ -320,15 +289,15 @@ function GalleryAdd() {
                             <Form.Control
                               multiple
                               type="file"
-                              id="addImage"
-                              onChange={handleAddImageFile}
+                              id="addImages"
+                              onChange={handleAddImageClick}
                               accept="image/png, image/jpeg, image/jpg, image/svg+xml"
                               className="d-none"
-                              aria-describedby="addImage"
+                              aria-describedby="addImages"
                             />
                             <label
                               className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
-                              htmlFor="addImage"
+                              htmlFor="addImages"
                             >
                               <span className="d-inline-flex align-middle">Upload Images</span>
                             </label>
@@ -338,9 +307,22 @@ function GalleryAdd() {
                         {formErrors.addImageFile && <p className="text-danger fs_13 mt-1">{formErrors.addImageFile}</p>}
                       </div>
                     </Col>
+
                     <Col lg={12}>
                       <Button variant="" className="px-4 text-white common_btn" disabled={loading} type="submit">
                         Publish
+                        {!draft && loading && (
+                          <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />
+                        )}
+                      </Button>
+                      <Button
+                        variant=""
+                        className="px-4 purple_color common_outline_btn ms-4"
+                        disabled={loading}
+                        onClick={() => setDraft(true)}
+                        type="submit"
+                      >
+                        Save as Draft
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>
                     </Col>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { deletePressRelease, getGalleryList } from '@/_services/services_api';
+import { deleteGallery, deletePressRelease, getGalleryList } from '@/_services/services_api';
 import { Badge, Card, Col, Container, Row } from 'react-bootstrap';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,9 +11,10 @@ import Image from 'next/image';
 
 const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 const DeleteModal = dynamic(import('../DeleteModal'));
+const TableLoader = dynamic(import('../DataTable/TableLoader'));
 
 function Gallery() {
-  const [pressReleases, setPressReleases] = useState(null);
+  const [gallery, setGallery] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,8 +53,8 @@ function Gallery() {
     };
     return (
       <>
-        <div className="action_btn">
-          <Link href={`press-release/${row.id}`}>
+        <div className="action_btn text-nowrap">
+          <Link href={`gallery/${row.id}`}>
             <FontAwesomeIcon
               title="Edit"
               icon={faEdit}
@@ -76,13 +77,14 @@ function Gallery() {
   }
 
   function renderPublishDate(value, row) {
-    return <span>{moment(row.updatedAt).format('DD-MMMM-YYYY')} </span>;
+    return <span className="text-nowrap">{moment(row.updatedAt).format('DD-MMMM-YYYY')} </span>;
   }
 
   function renderSatus(value, row) {
     const statusColors = {
       Published: 'success',
       Unpublished: 'danger',
+      Draft: 'warning',
     };
 
     return (
@@ -95,14 +97,14 @@ function Gallery() {
   }
 
   useEffect(() => {
-    handlePressReleasesList();
+    handleGalleryList();
   }, []);
 
-  const handlePressReleasesList = async (e) => {
+  const handleGalleryList = async (e) => {
     const res = await getGalleryList();
     if (res.status) {
       const data = res.data;
-      setPressReleases(data);
+      setGallery(data);
     }
   };
 
@@ -111,11 +113,11 @@ function Gallery() {
       id: deleteId.id,
     };
     setLoading(true);
-    const res = await deletePressRelease(params);
+    const res = await deleteGallery(params);
     if (res?.status) {
       toast.success(res?.message);
       setShowModal(false);
-      handlePressReleasesList();
+      handleGalleryList();
     } else {
       toast.error(res?.message);
     }
@@ -147,7 +149,7 @@ function Gallery() {
                     <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} className="me-1" /> Add
                   </Link>
                 </div>
-                {pressReleases && <CustomDataTable rows={pressReleases} columns={columns} options={options} />}
+                {(gallery && <CustomDataTable rows={gallery} columns={columns} options={options} />) || <TableLoader />}
               </Card.Body>
             </Card>
           </Col>

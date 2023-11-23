@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 
 const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 const DeleteModal = dynamic(import('../DeleteModal'));
+const TableLoader = dynamic(import('../DataTable/TableLoader'));
 
 function PressRelease() {
   const [pressReleases, setPressReleases] = useState(null);
@@ -22,7 +23,7 @@ function PressRelease() {
     { heading: 'Update By', field: 'update_by' },
     { heading: 'Updated Date', field: 'updatedAt' },
     { heading: 'Publish Date', field: 'publishDate' },
-    { heading: 'Status', field: 'status' },
+    { heading: 'Status', field: 'status', },
     { heading: 'Action', field: 'action', align: 'center' },
   ];
 
@@ -44,7 +45,7 @@ function PressRelease() {
     };
     return (
       <>
-        <div className="action_btn">
+        <div className="action_btn text-nowrap">
           <Link href={`press-release/${row.id}`}>
             <FontAwesomeIcon
               title="Edit"
@@ -68,11 +69,11 @@ function PressRelease() {
   }
 
   function renderDate(value, row) {
-    return <span>{moment(row.updatedAt).format('DD-MMMM-YYYY')} </span>;
+    return <span className="text-nowrap">{moment(row.updatedAt).format('DD-MMMM-YYYY')} </span>;
   }
 
   function renderPublishDate(value, row) {
-    return <span>{moment(row.publishDate).format('DD-MMMM-YYYY')} </span>;
+    return <span className="text-nowrap">{moment(row.publishDate).format('DD-MMMM-YYYY')} </span>;
   }
 
   function renderSatus(value, row) {
@@ -143,7 +144,10 @@ function PressRelease() {
                     <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} className="me-1" /> Add
                   </Link>
                 </div>
-                {pressReleases && <CustomDataTable rows={pressReleases} columns={columns} options={options} />}
+
+                {(pressReleases && <CustomDataTable rows={pressReleases} columns={columns} options={options} />) || (
+                  <TableLoader />
+                )}
               </Card.Body>
             </Card>
           </Col>
