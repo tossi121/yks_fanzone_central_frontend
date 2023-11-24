@@ -4,7 +4,7 @@ import { Badge, Card, Col, Container, Row } from 'react-bootstrap';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dynamic from 'next/dynamic';
-import { faEdit, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faImage, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -22,7 +22,7 @@ function Gallery() {
     { heading: 'Thumbnail Image', field: 'thumbnailImage' },
     { heading: 'Title', field: 'name_of_group' },
     { heading: 'Description', field: 'description_of_gallery' },
-    { heading: 'Publish Date', field: 'updatedAt' },
+    { heading: 'Publish Date', field: 'publishDate' },
     { heading: 'Status', field: 'status' },
     { heading: 'Action', field: 'action', align: 'center' },
   ];
@@ -31,7 +31,7 @@ function Gallery() {
     columns: {
       render: {
         thumbnailImage: renderThumbnailImage,
-        updatedAt: renderPublishDate,
+        publishDate: renderPublishDate,
         status: renderSatus,
         action: renderActions,
       },
@@ -41,7 +41,9 @@ function Gallery() {
   function renderThumbnailImage(value, row) {
     return (
       <>
-        <Image src={process.env.IMAGE_BASE + row.thumbnailImage} width={50} height={50} alt="thumbnailImage" />
+        {(row.thumbnailImage && (
+          <Image src={process.env.IMAGE_BASE + row.thumbnailImage} width={50} height={50} alt="thumbnailImage" />
+        )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={25} height={25} />}
       </>
     );
   }
@@ -77,7 +79,12 @@ function Gallery() {
   }
 
   function renderPublishDate(value, row) {
-    return <span className="text-nowrap">{moment(row.updatedAt).format('DD-MMMM-YYYY')} </span>;
+    return (
+      <>
+        {(row.publishDate && <span className="text-nowrap">{moment(row.publishDate).format('DD-MMMM-YYYY')} </span>) ||
+          'N/A'}
+      </>
+    );
   }
 
   function renderSatus(value, row) {

@@ -9,6 +9,9 @@ import Image from 'next/image';
 import { addGallery } from '@/_services/services_api';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import moment from 'moment';
 
 function GalleryAdd() {
   const [formValues, setFormValues] = useState({ title: '', description: '', status: 'Published' });
@@ -16,7 +19,7 @@ function GalleryAdd() {
   const [loading, setLoading] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [addImageFile, setAddImageFile] = useState([]);
-  const [draft, setDraft] = useState(false);
+  const [publishDate, setPublishDate] = useState(null);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -89,18 +92,15 @@ function GalleryAdd() {
         name_of_group: formValues.title,
         description_of_gallery: formValues.description,
         images: addImageFile,
-        thumbnailImage: thumbnailFile[0],
-        status: (!draft && formValues.status) || 'Draft',
+        thumbnailImage: thumbnailFile?.[0] || '',
+        publishDate: moment(publishDate).format('YYYY-MM-DD'),
+        status: formValues.status,
       };
 
       const res = await addGallery(params);
 
       if (res?.status) {
-        if (draft) {
-          toast.success('Save as draft successfully');
-        } else {
-          toast.success(res.message);
-        }
+        toast.success(res.message);
         router.push('/gallery');
       } else {
         toast.error(res?.message);
@@ -113,30 +113,40 @@ function GalleryAdd() {
   const formValidation = (values) => {
     const errors = {};
 
-    if (!values.title) {
-      errors.title = 'Please enter a title ';
-    }
-
-    if (!values.description) {
-      errors.description = 'Please enter a description';
-    } else if (values.description.length > 150) {
-      errors.description = 'Description should be 150 characters or less';
-    }
-
-    if (!thumbnailFile) {
-      errors.thumbnailFile = 'Please upload a thumbnail';
-    } else if (thumbnailFile.size > 10 * 1024 * 1024) {
-      errors.thumbnailFile = 'File size should be 10 MB or less';
-    }
-    if (addImageFile.length == 0) {
-      errors.addImageFile = 'Please upload a thumbnail';
-    }
-
-    addImageFile.forEach((file, index) => {
-      if (file.size > 10 * 1024 * 1024) {
-        errors.addImageFile = `File size should be 1 MB or less`;
+    if (values.status === 'Draft') {
+      if (!values.title && !values.description && !publishDate && !thumbnailFile && addImageFile.length === 0) {
+        toast.error('At least one field is required');
+        errors.status = 'At least one field is required';
       }
-    });
+    } else {
+      if (!values.title) {
+        errors.title = 'Please enter a title';
+      }
+      if (!publishDate) {
+        errors.publishDate = 'Please select a publish date';
+      }
+      if (!values.description) {
+        errors.description = 'Please enter a description';
+      } else if (values.description.length > 150) {
+        errors.description = 'Description should be 150 characters or less';
+      }
+
+      if (!thumbnailFile) {
+        errors.thumbnailFile = 'Please upload a thumbnail';
+      } else if (thumbnailFile.size > 10 * 1024 * 1024) {
+        errors.thumbnailFile = 'File size should be 10 MB or less';
+      }
+
+      if (addImageFile.length === 0) {
+        errors.addImageFile = 'Please upload at least one image';
+      } else {
+        addImageFile.forEach((file) => {
+          if (file.size > 10 * 1024 * 1024) {
+            errors.addImageFile = 'File size should be 1 MB or less';
+          }
+        });
+      }
+    }
 
     return errors;
   };
@@ -156,7 +166,7 @@ function GalleryAdd() {
                   <h4 className="fw-bold mb-0">Add Gallery</h4>
                 </div>
                 <Form autoComplete="off" className="mt-3" onSubmit={handleSubmit}>
-                  <Row className="align-items-center">
+                  <Row>
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group>
@@ -173,6 +183,8 @@ function GalleryAdd() {
                         </Form.Group>
                       </div>
                     </Col>
+              
+
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Status</Form.Label>
                       <div className="mb-3">
@@ -198,6 +210,36 @@ function GalleryAdd() {
                           onChange={handleChange}
                           name="status"
                         />
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Draft"
+                          type="radio"
+                          id="Draft"
+                          value="Draft"
+                          checked={formValues.status === 'Draft'}
+                          onChange={handleChange}
+                          name="status"
+                        />
+                      </div>
+                    </Col>
+                    <Col lg={6}>
+                      <Form.Label className="blue_dark fw-medium">Select Publish Date</Form.Label>
+                      <div className="mb-3 d-flex flex-column">
+                        <ReactDatePicker
+                          peekNextMonth
+                          showMonthDropdown
+                          showYearDropdown
+                          dropdownMode="select"
+                          selected={publishDate}
+                          onChange={(date) => setPublishDate(date)}
+                          placeholderText="Select Publish Date"
+                          showTimeSelect={false}
+                          dateFormat="dd-MMM-yyyy"
+                          className="shadow-none fs_14 slate_gray"
+                          onKeyDown={(e) => e.preventDefault()}
+                        />
+                        {formErrors.publishDate && <p className="text-danger fs_13 mt-1">{formErrors.publishDate}</p>}
                       </div>
                     </Col>
                     <Col lg={6}>
@@ -266,7 +308,7 @@ function GalleryAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload Images</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          <div className="d-flex align-items-center gap-3 overflow-auto w-100 h-100 justify-content-center">
+                          <div className="d-flex flex-wrap align-items-center gap-3 overflow-auto w-100 h-100 justify-content-center">
                             {(addImageFile?.length > 0 &&
                               addImageFile.map((preview, index) => (
                                 <>
@@ -311,18 +353,6 @@ function GalleryAdd() {
                     <Col lg={12}>
                       <Button variant="" className="px-4 text-white common_btn" disabled={loading} type="submit">
                         Publish
-                        {!draft && loading && (
-                          <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />
-                        )}
-                      </Button>
-                      <Button
-                        variant=""
-                        className="px-4 purple_color common_outline_btn ms-4"
-                        disabled={loading}
-                        onClick={() => setDraft(true)}
-                        type="submit"
-                      >
-                        Save as Draft
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>
                     </Col>

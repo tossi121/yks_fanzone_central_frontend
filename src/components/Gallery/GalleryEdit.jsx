@@ -9,6 +9,9 @@ import Image from 'next/image';
 import { currentGallery, updateGallery } from '@/_services/services_api';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import moment from 'moment';
 
 function GalleryEdit({ id }) {
   const galleryId = id;
@@ -18,6 +21,7 @@ function GalleryEdit({ id }) {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [addImageFile, setAddImageFile] = useState([]);
   const [currentGalleryData, setCurrentGalleryData] = useState(null);
+  const [publishDate, setPublishDate] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,6 +38,12 @@ function GalleryEdit({ id }) {
         status: currentGalleryData?.status || '',
       };
       setFormValues(values);
+      const date = new Date(currentGalleryData?.publishDate || '');
+      if (!isNaN(date.getTime())) {
+        setPublishDate(date);
+      } else {
+        console.error('Invalid date format');
+      }
       setThumbnailFile(currentGalleryData?.thumbnailImage);
       setAddImageFile(currentGalleryData?.images);
     }
@@ -117,7 +127,8 @@ function GalleryEdit({ id }) {
         name_of_group: formValues.title,
         description_of_gallery: formValues.description,
         images: addImageFile,
-        thumbnailImage: thumbnailFile,
+        thumbnailImage: thumbnailFile?.[0] || '',
+        publishDate: moment(publishDate).format('YYYY-MM-DD'),
         status: formValues.status,
       };
 
@@ -138,7 +149,11 @@ function GalleryEdit({ id }) {
     const errors = {};
 
     if (!values.title) {
-      errors.title = 'Please enter a title ';
+      errors.title = 'Please enter a title';
+    }
+
+    if (values.status == 'Draft') {
+      errors.status = 'Please select status';
     }
 
     if (!values.description) {
@@ -146,7 +161,9 @@ function GalleryEdit({ id }) {
     } else if (values.description.length > 150) {
       errors.description = 'Description should be 150 characters or less';
     }
-
+    if (!publishDate) {
+      errors.publishDate = 'Please select a publish date';
+    }
     if (!thumbnailFile) {
       errors.thumbnailFile = 'Please upload a thumbnail';
     } else if (thumbnailFile.size > 10 * 1024 * 1024) {
@@ -180,7 +197,7 @@ function GalleryEdit({ id }) {
                   <h4 className="fw-bold mb-0">Edit Gallery</h4>
                 </div>
                 <Form autoComplete="off" className="mt-3" onSubmit={handleSubmit}>
-                  <Row className="align-items-center">
+                  <Row>
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group>
@@ -222,8 +239,30 @@ function GalleryEdit({ id }) {
                           onChange={handleChange}
                           name="status"
                         />
+                      {formErrors.status && <p className="text-danger fs_13 mt-1">{formErrors.status}</p>}
                       </div>
                     </Col>
+
+                    <Col lg={6}>
+                      <Form.Label className="blue_dark fw-medium">Select Publish Date</Form.Label>
+                      <div className="mb-3 d-flex flex-column">
+                        <ReactDatePicker
+                          peekNextMonth
+                          showMonthDropdown
+                          showYearDropdown
+                          dropdownMode="select"
+                          selected={publishDate}
+                          onChange={(date) => setPublishDate(date)}
+                          placeholderText="Select Publish Date"
+                          showTimeSelect={false}
+                          dateFormat="dd-MMM-yyyy"
+                          className="shadow-none fs_14 slate_gray"
+                          onKeyDown={(e) => e.preventDefault()}
+                        />
+                        {formErrors.publishDate && <p className="text-danger fs_13 mt-1">{formErrors.publishDate}</p>}
+                      </div>
+                    </Col>
+
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group>
@@ -289,7 +328,7 @@ function GalleryEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Upload Images</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          <div className="d-flex justify-content-center align-items-center gap-3 overflow-auto w-100 h-100">
+                        <div className="d-flex flex-wrap align-items-center gap-3 overflow-auto w-100 h-100 justify-content-center">
                             {(addImageFile?.length > 0 &&
                               addImageFile.map((preview, index) => (
                                 <>
