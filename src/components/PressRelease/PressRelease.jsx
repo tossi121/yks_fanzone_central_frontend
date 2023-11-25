@@ -138,7 +138,7 @@ function PressRelease() {
           <Col>
             <Card className="bg-white">
               <Card.Body className="p-4">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-center flex-wrap">
                   <h4 className="fw-bold mb-0">Press Releases</h4>
                   <Link className="common_btn text-white px-3 py-1 rounded-2" href="/press-release/add">
                     <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} className="me-1" /> Add

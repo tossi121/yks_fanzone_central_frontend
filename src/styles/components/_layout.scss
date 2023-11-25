@@ -60,3 +60,10 @@
 .content_sm {
   width: calc(100% - 70px);
 }
+
+@media (max-width: 991px) {
+  .content_section {
+    width: calc(100% - 64px) !important;
+  }
+}
+

@@ -93,9 +93,11 @@
   }
 }
 
-@media (max-width: 520px) {
-  .search_input-box {
+@media (max-width: 630px) {
+  .search_input-box, .player_profile .search_input-box {
     right: unset !important;
+    top: 10px;
     position: relative !important;
   }
 }
+

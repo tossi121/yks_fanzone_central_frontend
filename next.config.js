@@ -12,6 +12,7 @@ const nextConfig = {
     BASE_API_URL: 'http://localhost:7012/',
     IMAGE_BASE: 'https://d1zoo736173x95.cloudfront.net/',
     LOGIN_DATA: 'login',
+
     // Press Releases
     PRESS_RELEASES_DATA: 'admin/pressreleases',
     PRESS_RELEASES_ADD_DATA: 'admin/addpressreleases',
@@ -23,8 +24,13 @@ const nextConfig = {
     GALLERY_DATA: 'admin/getallgalleries',
     GALLERY_ADD_DATA: 'admin/addgallery',
     GALLERY_DELETE_DATA: 'admin/deletegallery',
+
     // Player Profile
     PLAYER_PROFILE_DATA: 'admin/playerprofiles',
+
+    // UserAccess
+    USER_ACCESS_DATA: 'admin/getallusers',
+    USER_ACCESS_PERMISSIONS_DATA: 'admin/permissions',
   },
 };
 

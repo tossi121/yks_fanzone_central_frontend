@@ -72,7 +72,7 @@ function PlayerProfile() {
           <Col>
             <Card className="bg-white player_profile">
               <Card.Body className="p-4">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-center flex-wrap">
                   <h4 className="fw-bold mb-0">Player Profile</h4>
                 </div>
                 {(playerProfile && <CustomDataTable rows={playerProfile} columns={columns} options={options} />) || (

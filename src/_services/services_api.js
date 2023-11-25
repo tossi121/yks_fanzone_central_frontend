@@ -146,3 +146,22 @@ export async function updatePlayerProfile(id, params) {
     return null;
   }
 }
+
+// User Access
+export async function getUserAccessList(params) {
+  try {
+    const response = await fetcher('GET', process.env.USER_ACCESS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function getUserAccessPermissions(params) {
+  try {
+    const response = await fetcher('GET', process.env.USER_ACCESS_PERMISSIONS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
