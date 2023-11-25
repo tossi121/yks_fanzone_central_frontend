@@ -46,7 +46,7 @@
     display: flex;
     min-width: 32px;
     border-radius: 5px;
-
+    font-size: 14px;
     &:hover {
       background-color: $purple;
       border: 1px solid $purple;
@@ -85,6 +85,11 @@
   .fa-trash:hover {
     color: #dc3545 !important;
     transition: all ease-in-out 0.3s;
+  }
+}
+.player_profile {
+  .search_input-box {
+    right: 25px !important;
   }
 }
 

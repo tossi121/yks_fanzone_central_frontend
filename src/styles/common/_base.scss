@@ -2,7 +2,7 @@
 
 body,
 html {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: Arial, Helvetica, sans-serif;
   scroll-behavior: smooth;
   background-color: #f8f9fa !important;
 }
@@ -164,6 +164,7 @@ select {
 .react-datepicker__month-year-read-view--down-arrow,
 .react-datepicker__navigation-icon::before {
   top: 13px !important;
+  border-color: #fff !important;
 }
 
 .react-datepicker__year-select,
@@ -198,4 +199,27 @@ select {
 
 .react-datepicker__day--selected {
   background-color: $purple !important;
+}
+
+.react-datepicker__year-text--keyboard-selected {
+  background-color: $purple !important;
+  color: #ffff !important;
+}
+
+.react-datepicker-year-header {
+  color: #ffff !important;
+}
+.react-datepicker__year-text--in-selecting-range:not(
+    .react-datepicker__day--in-range,
+    .react-datepicker__month-text--in-range,
+    .react-datepicker__quarter-text--in-range,
+    .react-datepicker__year-text--in-range
+  ),
+.react-datepicker__year-text--in-range {
+  background-color: $purple !important;
+  color: #ffff !important;
+}
+
+.react-datepicker__year-wrapper {
+  max-width: 204px !important;
 }

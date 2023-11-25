@@ -23,6 +23,8 @@ const nextConfig = {
     GALLERY_DATA: 'admin/getallgalleries',
     GALLERY_ADD_DATA: 'admin/addgallery',
     GALLERY_DELETE_DATA: 'admin/deletegallery',
+    // Player Profile
+    PLAYER_PROFILE_DATA: 'admin/playerprofiles',
   },
 };
 

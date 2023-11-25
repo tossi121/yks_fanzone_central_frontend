@@ -115,3 +115,34 @@ export async function updateGallery(id, params) {
     return null;
   }
 }
+
+// Player Profile
+
+export async function getPlayerProfileList(params) {
+  try {
+    const response = await fetcher('GET', process.env.PLAYER_PROFILE_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function currentPlayerProfile(id) {
+  try {
+    const url = `${process.env.PLAYER_PROFILE_DATA}/${id}`;
+    const response = await fetcher('GET', url);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function updatePlayerProfile(id, params) {
+  try {
+    const url = `${process.env.PLAYER_PROFILE_DATA}/${id}`;
+    const response = await fetcher('POST', url, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
