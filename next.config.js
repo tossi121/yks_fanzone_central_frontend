@@ -9,7 +9,7 @@ const nextConfig = {
     unoptimized: true,
   },
   env: {
-    BASE_API_URL: 'http://localhost:7012/',
+    BASE_API_URL: 'http://192.168.1.23:7012/',
     IMAGE_BASE: 'https://d1zoo736173x95.cloudfront.net/',
     LOGIN_DATA: 'login',
 
@@ -31,6 +31,7 @@ const nextConfig = {
     // UserAccess
     USER_ACCESS_DATA: 'admin/getallusers',
     USER_ACCESS_PERMISSIONS_DATA: 'admin/permissions',
+    USER_ACCESS_ADD_PERMISSIONS_DATA: 'admin/addnewuser',
   },
 };
 

@@ -1,16 +1,19 @@
 import { validEmail, validName } from '@/_helper/regex';
-import { getUserAccessPermissions } from '@/_services/services_api';
+import { addUserAccessPermissions, getUserAccessPermissions } from '@/_services/services_api';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 
 function UserAccessAdd() {
-  const [formValues, setFormValues] = useState({ firstName: '', lastName: '', email: '', password: '', role: '' });
+  const [formValues, setFormValues] = useState({ firstName: '', lastName: '', email: '', password: '', role: [] });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [userPermissions, setUserPermissions] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     handleTournamentList();
@@ -31,19 +34,19 @@ function UserAccessAdd() {
     setLoading(true);
     if (Object.keys(errors).length === 0) {
       const params = {
-        title: formValues.title,
-        thumbnail: thumbnailFile,
-        pdfFile: pdfFile,
-        edition: formValues.edition,
-        publishDate: moment(publishDate).format('YYYY-MM-DD'),
-        status: formValues.status,
+        first_name: formValues.firstName,
+        last_name: formValues.lastName,
+        email: formValues.email,
+        password: formValues.password,
+        permissions: formValues.role,
+        user_role: 'admin',
       };
 
-      const res = await addPressRelease(params);
+      const res = await addUserAccessPermissions(params);
 
       if (res?.status) {
         toast.success(res.message);
-        router.push('/');
+        router.push('/user-access');
       } else {
         toast.error(res?.message);
       }
@@ -60,8 +63,8 @@ function UserAccessAdd() {
   const formValidation = (values) => {
     const errors = {};
 
-    if (!values.role) {
-      errors.role = 'Please select a role';
+    if (values.role.length === 0) {
+      errors.role = 'Please select permissions';
     }
 
     if (!values.email) {
@@ -90,6 +93,25 @@ function UserAccessAdd() {
 
     return errors;
   };
+
+  const handleRoleChange = (permission) => {
+    setFormValues((prevFormValues) => {
+      if (prevFormValues.role.includes(permission)) {
+        // If the permission is already in the array, remove it
+        return {
+          ...prevFormValues,
+          role: prevFormValues.role.filter((item) => item !== permission),
+        };
+      } else {
+        // If the permission is not in the array, add it
+        return {
+          ...prevFormValues,
+          role: [...prevFormValues.role, permission],
+        };
+      }
+    });
+  };
+
   return (
     <>
       <Container fluid>
@@ -159,7 +181,7 @@ function UserAccessAdd() {
                         <Form.Group>
                           <Form.Label className="blue_dark fw-medium">Enter Password</Form.Label>
                           <Form.Control
-                            type="text"
+                            type="password"
                             placeholder="Enter Password"
                             name="password"
                             className="shadow-none fs_14 slate_gray"
@@ -172,23 +194,28 @@ function UserAccessAdd() {
                     </Col>
                     <Col lg={6}>
                       <div className="mb-3">
+                        <Form.Label className="blue_dark fw-medium">Select Permissions</Form.Label>
                         <Form.Group>
-                          <Form.Label className="blue_dark fw-medium">Select Role</Form.Label>
-                          <Form.Select
-                            name="role"
-                            value={formValues.role}
-                            onChange={handleChange}
-                            className="shadow-none fs_14 slate_gray form-control cursor_pointer"
-                          >
-                            <option>Select Role</option>
-                            {userPermissions.map((item, key) => (
-                              <option key={key} value={item.permissions}>
+                          {userPermissions.map((item, key) => (
+                            <React.Fragment key={key}>
+                              <Form.Label
+                                className="cursor_pointer slate_gray fs_14 user-select-none me-3"
+                                htmlFor={item.permissions}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name={item.permissions}
+                                  id={item.permissions}
+                                  className="form-check-input me-2 shadow-none border"
+                                  checked={formValues.role.includes(item.permissions)}
+                                  onChange={() => handleRoleChange(item.permissions)}
+                                />
                                 {item.permissions}
-                              </option>
-                            ))}
-                          </Form.Select>
-                          {formErrors.role && <p className="text-danger fs_13 mt-1">{formErrors.role}</p>}
+                              </Form.Label>
+                            </React.Fragment>
+                          ))}
                         </Form.Group>
+                        {formErrors.role && <p className="text-danger fs_13 mt-1">{formErrors.role}</p>}
                       </div>
                     </Col>
                     <Col lg={12}>

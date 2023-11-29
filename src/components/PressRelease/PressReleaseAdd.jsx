@@ -187,8 +187,8 @@ function PressReleaseAdd() {
                           >
                             <option>Select Edition</option>
                             {tournamentName.map((item, key) => (
-                              <option key={key} value={item.tournamentName}>
-                                {item.tournamentName}
+                              <option key={key} value={item.name}>
+                                {item.name}
                               </option>
                             ))}
                           </Form.Select>

@@ -19,7 +19,7 @@ function UserAccess() {
     { heading: 'First Name', field: 'first_name' },
     { heading: 'Last Name', field: 'last_name' },
     { heading: 'Email', field: 'email' },
-    { heading: 'Role', field: 'user_role' },
+    { heading: 'Permissions', field: 'permissions' },
   ];
 
   useEffect(() => {
@@ -33,6 +33,16 @@ function UserAccess() {
       setUserAccess(data);
     }
   };
+
+  const options = {
+    columns: {
+      render: { permissions: renderPermissions },
+    },
+  };
+
+  function renderPermissions(value, row) {
+    return <span className="text-nowrap">{row.permissions.join(' , ')} </span>;
+  }
 
   return (
     <>
@@ -60,7 +70,9 @@ function UserAccess() {
                   </Link>
                 </div>
 
-                {(userAccess && <CustomDataTable rows={userAccess} columns={columns} />) || <TableLoader />}
+                {(userAccess && <CustomDataTable rows={userAccess} columns={columns} options={options} />) || (
+                  <TableLoader />
+                )}
               </Card.Body>
             </Card>
           </Col>

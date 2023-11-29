@@ -165,3 +165,12 @@ export async function getUserAccessPermissions(params) {
     return null;
   }
 }
+
+export async function addUserAccessPermissions(params) {
+  try {
+    const response = await fetcher('POST', process.env.USER_ACCESS_ADD_PERMISSIONS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}

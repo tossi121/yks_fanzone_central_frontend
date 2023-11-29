@@ -33,6 +33,8 @@ function Login() {
       if (res.status) {
         const token = res.data.accessToken;
         Cookies.set('yks_fanzone_central_token', token.access_token, { expires: 30, path: '/' });
+        Cookies.set('yks_fanzone_central_user_name', token.user_name, { expires: 30, path: '/' });
+        Cookies.set('yks_fanzone_central_permissions', token.permissions, { expires: 30, path: '/' });
         router.push('/');
         toast.success(res.message);
       } else {
@@ -59,6 +61,7 @@ function Login() {
 
     return errors;
   };
+
 
   return (
     <>

@@ -1,24 +1,35 @@
 import React from 'react';
-import { Row, Col, Dropdown, Button } from 'react-bootstrap';
+import { Row, Col, Dropdown } from 'react-bootstrap';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { useEffect } from 'react';
+import { useState } from 'react';
 
 function Topbar(props) {
   const { handleToggle } = props;
   const router = useRouter();
+  const [userName, setUserName] = useState(null);
 
   function logout() {
     Cookies.remove('yks_fanzone_central_token');
+    Cookies.remove('yks_fanzone_central_user_name');
+    Cookies.remove('yks_fanzone_central_permissions');
     router.push('/login');
     history.pushState(null, null, location.href);
     window.onpopstate = function () {
       history.go(1);
     };
   }
+
+  useEffect(() => {
+    const name = Cookies.get('yks_fanzone_central_user_name');
+    setUserName(name);
+  }, [userName]);
+
   return (
     <>
       <div className="w-100 top_bar position-sticky top-0 bg-white shadow-sm">
@@ -33,15 +44,14 @@ function Topbar(props) {
               </div>
               <div className="ms-auto d-lg-flex d-none mx-2 align-items-center">
                 <Image src={'/images/user.png'} alt="image" height={50} width={50} className="rounded-circle" />
-                <div className="ms-3">
-                  <span className="blue_dark fw-bold fs_14 text-capitalize">Super Admin</span>
+                <div className="mx-3">
                   <Dropdown className="slate_gray">
                     <Dropdown.Toggle
                       variant="none"
                       className="p-0 border-0 d-flex align-items-center"
                       id="dropdown-basic"
                     >
-                      <span className="fs_12 slate_gray">Super Admin</span>
+                      <span className="blue_dark fw-bold fs_14 text-capitalize">{userName || ''}</span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="w-100 rounded-4">
                       <Dropdown.Item className="py-2 fs_14 slate_gray" onClick={logout}>
