@@ -1,5 +1,9 @@
 import { validEmail, validName } from '@/_helper/regex';
-import { addUserAccessPermissions, getUserAccessPermissions } from '@/_services/services_api';
+import {
+  updateUserAccessPermissions,
+  currentUserAccessPermission,
+  getUserAccessPermissions,
+} from '@/_services/services_api';
 import { faArrowLeft, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
@@ -8,34 +12,61 @@ import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 
-function UserAccessAdd() {
+function UserAccessEdit({ id }) {
+  const userId = id;
   const [formValues, setFormValues] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
     status: 'Active',
+    password: '',
     role: [],
   });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [userPermissions, setUserPermissions] = useState([]);
-  const router = useRouter();
+  const [currentUserData, setCurrentUserData] = useState(null);
   const [passwordShown, setPasswordShown] = useState(false);
+  const router = useRouter();
 
   const togglePassword = () => {
     setPasswordShown(!passwordShown);
   };
 
   useEffect(() => {
-    handleUserPermissionsList();
-  }, []);
+    if (userId) {
+      handleUserPermissionsList();
+      handleCurrentUserPermissions();
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      const values = {
+        firstName: currentUserData?.first_name || '',
+        lastName: currentUserData?.last_name || '',
+        email: currentUserData?.email || '',
+        password: currentUserData?.password || '',
+        status: currentUserData?.status || '',
+        role: currentUserData?.permissions || '',
+      };
+      setFormValues(values);
+    }
+  }, [userId, currentUserData]);
 
   const handleUserPermissionsList = async () => {
     const res = await getUserAccessPermissions();
     if (res?.status) {
       const data = res.data;
       setUserPermissions(data);
+    }
+  };
+
+  const handleCurrentUserPermissions = async () => {
+    const res = await currentUserAccessPermission(userId);
+    if (res?.status) {
+      const data = res.data;
+      setCurrentUserData(data);
     }
   };
 
@@ -46,15 +77,16 @@ function UserAccessAdd() {
     setLoading(true);
     if (Object.keys(errors).length === 0) {
       const params = {
+        id: userId,
         first_name: formValues.firstName,
         last_name: formValues.lastName,
         email: formValues.email,
         password: formValues.password,
-        permissions: formValues.role,
         status: formValues.status,
+        permissions: formValues.role,
       };
 
-      const res = await addUserAccessPermissions(params);
+      const res = await updateUserAccessPermissions(params);
 
       if (res?.status) {
         toast.success(res.message);
@@ -136,7 +168,7 @@ function UserAccessAdd() {
             <Card className="bg-white mt-3">
               <Card.Body className="p-4">
                 <div className="d-flex justify-content-between align-items-center">
-                  <h4 className="fw-bold mb-0">Add User Access</h4>
+                  <h4 className="fw-bold mb-0">Edit User Access</h4>
                 </div>
                 <Form autoComplete="off" className="mt-3" onSubmit={handleSubmit}>
                   <Row className="align-items-center">
@@ -189,7 +221,7 @@ function UserAccessAdd() {
                       </div>
                     </Col>
                     <Col lg={6}>
-                      <div className="mb-3">
+                      <div className="mb-3 position-relative">
                         <Form.Group>
                           <Form.Label className="blue_dark fw-medium">Enter Password</Form.Label>
                           <Form.Control
@@ -200,14 +232,13 @@ function UserAccessAdd() {
                             value={formValues.password}
                             onChange={handleChange}
                           />
-
                           {(passwordShown && (
                             <FontAwesomeIcon
                               icon={faEye}
                               width={18}
                               height={18}
                               onClick={togglePassword}
-                              className="blue_dark cursor_pointer position-absolute password_icon end-0 fs-2 me-5"
+                              className="blue_dark cursor_pointer position-absolute password_icon end-0 fs-2 me-3"
                             />
                           )) || (
                             <FontAwesomeIcon
@@ -215,7 +246,7 @@ function UserAccessAdd() {
                               width={18}
                               height={18}
                               onClick={togglePassword}
-                              className="blue_dark cursor_pointer position-absolute password_icon end-0 fs-2 me-5"
+                              className="blue_dark cursor_pointer position-absolute password_icon end-0 fs-2 me-3"
                             />
                           )}
                           {formErrors.password && <p className="text-danger fs_13 mt-1">{formErrors.password}</p>}
@@ -276,10 +307,9 @@ function UserAccessAdd() {
                         />
                       </div>
                     </Col>
-
                     <Col lg={12}>
                       <Button variant="" className="px-4 text-white common_btn" disabled={loading} type="submit">
-                        Create
+                        Update
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>
                     </Col>
@@ -294,4 +324,4 @@ function UserAccessAdd() {
   );
 }
 
-export default UserAccessAdd;
+export default UserAccessEdit;

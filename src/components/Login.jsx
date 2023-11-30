@@ -1,5 +1,7 @@
 import { validEmail } from '@/_helper/regex';
 import { getLogin } from '@/_services/services_api';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -12,6 +14,11 @@ function Login() {
   const [formValues, setFormValues] = useState({ email: '', password: '' });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [passwordShown, setPasswordShown] = useState(false);
+
+  const togglePassword = () => {
+    setPasswordShown(!passwordShown);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,7 +69,6 @@ function Login() {
     return errors;
   };
 
-
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -102,17 +108,34 @@ function Login() {
                             {formErrors.email && <p className="text-danger fs_13 mt-1">{formErrors.email}</p>}
                           </Form.Group>
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-4 position-relative">
                           <Form.Group>
                             <Form.Label className="blue_dark fw-medium">Enter Password</Form.Label>
                             <Form.Control
-                              type="password"
+                              type={(passwordShown && 'text') || 'password'}
                               placeholder="Enter Your Password"
                               name="password"
                               className="shadow-none fs_14 slate_gray"
                               value={formValues.password.replace(/\s+/g, '')}
                               onChange={handleChange}
                             />
+                            {(passwordShown && (
+                              <FontAwesomeIcon
+                                icon={faEye}
+                                width={18}
+                                height={18}
+                                onClick={togglePassword}
+                                className="blue_dark cursor_pointer position-absolute password_icon end-0 fs-2 me-3"
+                              />
+                            )) || (
+                              <FontAwesomeIcon
+                                icon={faEyeSlash}
+                                width={18}
+                                height={18}
+                                onClick={togglePassword}
+                                className="blue_dark cursor_pointer position-absolute password_icon end-0 fs-2 me-3"
+                              />
+                            )}
                             {formErrors.password && <p className="text-danger fs_13 mt-1">{formErrors.password}</p>}
                           </Form.Group>
                         </div>

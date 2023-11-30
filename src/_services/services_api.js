@@ -174,3 +174,32 @@ export async function addUserAccessPermissions(params) {
     return null;
   }
 }
+
+export async function deleteUserAccessPermission(id) {
+  try {
+    const url = `${process.env.USER_ACCESS_DELETE_PERMISSIONS_DATA}/${id}`;
+    const response = await fetcher('POST', url);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function currentUserAccessPermission(id) {
+  try {
+    const url = `${process.env.USER_ACCESS_CURRENT_PERMISSIONS_DATA}/${id}`;
+    const response = await fetcher('GET', url);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function updateUserAccessPermissions(params) {
+  try {
+    const response = await fetcher('POST', process.env.USER_ACCESS_UPDATE_PERMISSIONS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}

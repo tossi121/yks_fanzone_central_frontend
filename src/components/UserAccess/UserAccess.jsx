@@ -1,10 +1,11 @@
-import { getUserAccessList } from '@/_services/services_api';
-import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { deleteUserAccessPermission, getUserAccessList } from '@/_services/services_api';
+import { faEdit, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { Badge, Card, Col, Container, Row } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 
 const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 const DeleteModal = dynamic(import('../DeleteModal'));
@@ -20,13 +21,15 @@ function UserAccess() {
     { heading: 'Last Name', field: 'last_name' },
     { heading: 'Email', field: 'email' },
     { heading: 'Permissions', field: 'permissions' },
+    { heading: 'Status', field: 'status' },
+    { heading: 'Action', field: 'action', align: 'center' },
   ];
 
   useEffect(() => {
-    handlePressReleasesList();
+    handleUserAccessList();
   }, []);
 
-  const handlePressReleasesList = async (e) => {
+  const handleUserAccessList = async (e) => {
     const res = await getUserAccessList();
     if (res.status) {
       const data = res.data;
@@ -36,13 +39,71 @@ function UserAccess() {
 
   const options = {
     columns: {
-      render: { permissions: renderPermissions },
+      render: { permissions: renderPermissions, status: renderSatus, action: renderActions },
     },
   };
 
   function renderPermissions(value, row) {
     return <span className="text-nowrap">{row.permissions.join(' , ')} </span>;
   }
+
+  function renderActions(value, row) {
+    const handleDeleteModal = () => {
+      setDeleteId(row);
+      setShowModal(true);
+    };
+    return (
+      <>
+        <div className="action_btn text-nowrap">
+          <Link href={`user-access/${row.id}`}>
+            <FontAwesomeIcon
+              title="Edit"
+              icon={faEdit}
+              width={15}
+              height={15}
+              className="cursor_pointer blue_dark me-3"
+            />
+          </Link>
+          <FontAwesomeIcon
+            title="Delete"
+            onClick={handleDeleteModal}
+            icon={faTrash}
+            width={15}
+            height={15}
+            className="cursor_pointer blue_dark"
+          />
+        </div>
+      </>
+    );
+  }
+
+  function renderSatus(value, row) {
+    const statusColors = {
+      Active: 'success',
+      Inactive: 'danger',
+    };
+
+    return (
+      <>
+        <Badge pill bg={statusColors[row.status]} className="fs_12">
+          {row.status}
+        </Badge>
+      </>
+    );
+  }
+
+  const handleDelete = async (e) => {
+    setLoading(true);
+    const res = await deleteUserAccessPermission(deleteId.id);
+    if (res?.status) {
+      toast.success(res?.message);
+      setShowModal(false);
+      handleUserAccessList();
+    } else {
+      toast.error(res?.message);
+    }
+    setLoading(false);
+  };
 
   return (
     <>

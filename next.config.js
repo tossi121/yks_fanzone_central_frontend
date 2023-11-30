@@ -32,6 +32,9 @@ const nextConfig = {
     USER_ACCESS_DATA: 'admin/getallusers',
     USER_ACCESS_PERMISSIONS_DATA: 'admin/permissions',
     USER_ACCESS_ADD_PERMISSIONS_DATA: 'admin/addnewuser',
+    USER_ACCESS_DELETE_PERMISSIONS_DATA: 'admin/deleteuser',
+    USER_ACCESS_CURRENT_PERMISSIONS_DATA: 'admin/getusers',
+    USER_ACCESS_UPDATE_PERMISSIONS_DATA: 'admin/updateuser',
   },
 };
 

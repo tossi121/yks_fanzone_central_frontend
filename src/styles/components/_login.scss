@@ -1,7 +1,10 @@
 .login_section {
-  background: url('/images/auth-v1-tree.png'), url('/images/auth-v1-tree-2.png'),
-    url('/images/auth-v1-mask-light.png');
+  background: url('/images/auth-v1-tree.png'), url('/images/auth-v1-tree-2.png'), url('/images/auth-v1-mask-light.png');
   background-position: left bottom 4%, right bottom 7%, bottom;
   background-repeat: no-repeat;
   background-size: 12%, 20%, 100%;
+}
+
+.password_icon {
+  transform: translate(0, -165%);
 }

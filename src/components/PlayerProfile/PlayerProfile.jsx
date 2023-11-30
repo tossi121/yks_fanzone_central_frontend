@@ -18,7 +18,7 @@ function PlayerProfile() {
     { heading: 'Nick Name', field: 'nick_name' },
     { heading: 'Position', field: 'position' },
     { heading: 'DOB', field: 'date_of_birth' },
-    { heading: 'Home Town', field: 'home_town' },
+    { heading: 'Country', field: 'home_town' },
     { heading: 'Height', field: 'height' },
     { heading: 'Years Active', field: 'years_active' },
     { heading: 'Skill', field: 'skill' },

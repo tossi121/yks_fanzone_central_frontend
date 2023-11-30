@@ -17,7 +17,7 @@ function PlayerProfileEdit({ id }) {
     nickName: '',
     position: '',
     height: '',
-    homeTown: '',
+    country: '',
     skills: '',
     bio: '',
   });
@@ -50,7 +50,7 @@ function PlayerProfileEdit({ id }) {
         nickName: currentPlayer?.nick_name || '',
         position: currentPlayer?.position || '',
         height: currentPlayer?.height || '',
-        homeTown: currentPlayer?.home_town || '',
+        country: currentPlayer?.home_town || '',
         skills: currentPlayer?.skill || '',
         bio: currentPlayer?.bio || '',
       };
@@ -87,7 +87,7 @@ function PlayerProfileEdit({ id }) {
         nick_name: formValues.nickName,
         position: formValues.position,
         date_of_birth: moment(dob).format('YYYY-MM-DD'),
-        home_town: formValues.homeTown,
+        home_town: formValues.country,
         height: formValues.height,
         years_active: yearsActive,
         skill: formValues.skills,
@@ -122,8 +122,8 @@ function PlayerProfileEdit({ id }) {
       errors.nickName = 'Please enter a nick name';
     }
 
-    if (!values.homeTown) {
-      errors.homeTown = 'Please enter a Home Town';
+    if (!values.country) {
+      errors.country = 'Please enter a country';
     }
 
     if (!values.position) {
@@ -230,16 +230,16 @@ function PlayerProfileEdit({ id }) {
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group>
-                          <Form.Label className="blue_dark fw-medium">Enter Home Town</Form.Label>
+                          <Form.Label className="blue_dark fw-medium">Enter Country</Form.Label>
                           <Form.Control
                             type="text"
-                            placeholder="Enter Home Town"
-                            name="homeTown"
+                            placeholder="Enter Country"
+                            name="country"
                             className="shadow-none fs_14 slate_gray"
-                            value={formValues.homeTown}
+                            value={formValues.country}
                             onChange={handleChange}
                           />
-                          {formErrors.homeTown && <p className="text-danger fs_13 mt-1">{formErrors.homeTown}</p>}
+                          {formErrors.country && <p className="text-danger fs_13 mt-1">{formErrors.country}</p>}
                         </Form.Group>
                       </div>
                     </Col>

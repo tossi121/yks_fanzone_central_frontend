@@ -217,8 +217,8 @@ function PressReleaseEdit({ id }) {
                             className="shadow-none fs_14 slate_gray form-control cursor_pointer"
                           >
                             {tournamentName.map((item, key) => (
-                              <option key={key} value={item.tournamentName}>
-                                {item.tournamentName}
+                              <option key={key} value={item.name}>
+                                {item.name}
                               </option>
                             ))}
                           </Form.Select>
