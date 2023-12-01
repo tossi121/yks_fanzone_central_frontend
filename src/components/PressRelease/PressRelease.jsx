@@ -69,11 +69,11 @@ function PressRelease() {
   }
 
   function renderDate(value, row) {
-    return <span className="text-nowrap">{moment(row.updatedAt).format('DD-MMMM-YYYY')} </span>;
+    return <span className="text-nowrap">{moment(row.updatedAt).format('DD MMMM YYYY')} </span>;
   }
 
   function renderPublishDate(value, row) {
-    return <span className="text-nowrap">{moment(row.publishDate).format('DD-MMMM-YYYY')} </span>;
+    return <span className="text-nowrap">{moment(row.publishDate).format('DD MMMM YYYY')} </span>;
   }
 
   function renderSatus(value, row) {

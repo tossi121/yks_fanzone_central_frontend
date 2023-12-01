@@ -47,7 +47,7 @@ function PlayerProfile() {
   };
 
   function renderDate(value, row) {
-    return <span className="text-nowrap">{moment(row.date_of_birth).format('DD-MMMM-YYYY')} </span>;
+    return <span className="text-nowrap">{moment(row.date_of_birth).format('DD MMMM YYYY')} </span>;
   }
 
   function renderActions(value, row) {

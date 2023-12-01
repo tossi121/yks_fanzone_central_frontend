@@ -219,7 +219,7 @@ function PlayerProfileEdit({ id }) {
                           onChange={(date) => setDob(date)}
                           placeholderText="Select Date of Birth"
                           showTimeSelect={false}
-                          dateFormat="dd-MMM-yyyy"
+                          dateFormat="dd MMM yyyy"
                           className="shadow-none fs_14 slate_gray"
                           onKeyDown={(e) => e.preventDefault()}
                         />

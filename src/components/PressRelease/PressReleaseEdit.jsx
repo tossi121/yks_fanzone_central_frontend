@@ -238,7 +238,7 @@ function PressReleaseEdit({ id }) {
                           onChange={(date) => setPublishDate(date)}
                           placeholderText="Select Publish Date"
                           showTimeSelect={false}
-                          dateFormat="dd-MMM-yyyy"
+                          dateFormat="dd MMM yyyy"
                           className="shadow-none fs_14 slate_gray"
                           onKeyDown={(e) => e.preventDefault()}
                         />

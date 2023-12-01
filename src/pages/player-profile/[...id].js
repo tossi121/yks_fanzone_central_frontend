@@ -9,6 +9,7 @@ function DefaultPage() {
   const router = useRouter();
   const token = Cookies.get('yks_fanzone_central_permissions');
   const tokenValues = token?.split(',');
+  const id = router.query.id;
 
   useEffect(() => {
     if (!tokenValues.includes('manage_player_profile')) {

@@ -81,7 +81,7 @@ function Gallery() {
   function renderPublishDate(value, row) {
     return (
       <>
-        {(row.publishDate && <span className="text-nowrap">{moment(row.publishDate).format('DD-MMMM-YYYY')} </span>) ||
+        {(row.publishDate && <span className="text-nowrap">{moment(row.publishDate).format('DD MMMM YYYY')} </span>) ||
           'N/A'}
       </>
     );
