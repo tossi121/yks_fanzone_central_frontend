@@ -12,6 +12,7 @@ const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 
 function PlayerProfile() {
   const [playerProfile, setPlayerProfile] = useState([]);
+  const [loading, setLoading] = useState(false);
   const columns = [
     { heading: 'Id', field: 'id' },
     { heading: 'Name', field: 'name' },
@@ -26,7 +27,7 @@ function PlayerProfile() {
     { heading: 'Action', field: 'action', align: 'center' },
   ];
   useEffect(() => {
-    handlePressReleasesList();
+    handlePlayerList();
   }, []);
 
   const options = {
@@ -35,12 +36,14 @@ function PlayerProfile() {
     },
   };
 
-  const handlePressReleasesList = async (e) => {
+  const handlePlayerList = async () => {
+    setLoading(true);
     const res = await getPlayerProfileList();
     if (res.status) {
       const data = res.data;
       setPlayerProfile(data);
     }
+    setLoading(false);
   };
 
   function renderDate(value, row) {
@@ -75,9 +78,9 @@ function PlayerProfile() {
                 <div className="d-flex justify-content-between align-items-center flex-wrap">
                   <h4 className="fw-bold mb-0">Player Profile</h4>
                 </div>
-                {(playerProfile && <CustomDataTable rows={playerProfile} columns={columns} options={options} />) || (
-                  <TableLoader />
-                )}
+                {(!loading && playerProfile && (
+                  <CustomDataTable rows={playerProfile} columns={columns} options={options} />
+                )) || <TableLoader />}
               </Card.Body>
             </Card>
           </Col>

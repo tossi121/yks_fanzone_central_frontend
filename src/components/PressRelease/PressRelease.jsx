@@ -23,7 +23,7 @@ function PressRelease() {
     { heading: 'Update By', field: 'update_by' },
     { heading: 'Updated Date', field: 'updatedAt' },
     { heading: 'Publish Date', field: 'publishDate' },
-    { heading: 'Status', field: 'status', },
+    { heading: 'Status', field: 'status' },
     { heading: 'Action', field: 'action', align: 'center' },
   ];
 
@@ -96,12 +96,16 @@ function PressRelease() {
   }, []);
 
   const handlePressReleasesList = async (e) => {
+    setLoading(true);
     const res = await getPressReleasesList();
     if (res.status) {
       const data = res.data;
       setPressReleases(data);
     }
+    setLoading(false);
   };
+
+  console.log(loading);
 
   const handleDelete = async (e) => {
     const params = {
@@ -145,9 +149,9 @@ function PressRelease() {
                   </Link>
                 </div>
 
-                {(pressReleases && <CustomDataTable rows={pressReleases} columns={columns} options={options} />) || (
-                  <TableLoader />
-                )}
+                {(!loading && pressReleases && (
+                  <CustomDataTable rows={pressReleases} columns={columns} options={options} />
+                )) || <TableLoader />}
               </Card.Body>
             </Card>
           </Col>

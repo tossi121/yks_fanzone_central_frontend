@@ -43,7 +43,7 @@ function Topbar(props) {
                 <FontAwesomeIcon icon={faBars} onClick={handleToggle} width={18} height={18} />
               </div>
               <div className="ms-auto d-lg-flex d-none mx-2 align-items-center">
-                <Image src={'/images/user.png'} alt="image" height={50} width={50} className="rounded-circle" />
+                <span className="blue_dark fw-bold fs_14 text-capitalize">{userName || ''}</span>
                 <div className="mx-3">
                   <Dropdown className="slate_gray">
                     <Dropdown.Toggle
@@ -51,7 +51,7 @@ function Topbar(props) {
                       className="p-0 border-0 d-flex align-items-center"
                       id="dropdown-basic"
                     >
-                      <span className="blue_dark fw-bold fs_14 text-capitalize">{userName || ''}</span>
+                      <Image src={'/images/user.png'} alt="image" height={40} width={40} className="rounded-circle" />
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="w-100 rounded-4">
                       <Dropdown.Item className="py-2 fs_14 slate_gray" onClick={logout}>

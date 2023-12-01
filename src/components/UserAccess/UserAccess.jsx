@@ -30,11 +30,13 @@ function UserAccess() {
   }, []);
 
   const handleUserAccessList = async (e) => {
+    setLoading(true);
     const res = await getUserAccessList();
     if (res.status) {
       const data = res.data;
       setUserAccess(data);
     }
+    setLoading(false);
   };
 
   const options = {
@@ -131,9 +133,9 @@ function UserAccess() {
                   </Link>
                 </div>
 
-                {(userAccess && <CustomDataTable rows={userAccess} columns={columns} options={options} />) || (
-                  <TableLoader />
-                )}
+                {(!loading && userAccess && (
+                  <CustomDataTable rows={userAccess} columns={columns} options={options} />
+                )) || <TableLoader />}
               </Card.Body>
             </Card>
           </Col>

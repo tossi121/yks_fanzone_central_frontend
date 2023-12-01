@@ -11,6 +11,9 @@
     span:hover {
       color: $purple !important;
     }
+    .dropdown-toggle::after{
+      border: unset !important;
+    }
     .dropdown-item {
       &:hover {
         background: #f1f3f5 !important;

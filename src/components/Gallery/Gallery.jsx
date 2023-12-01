@@ -108,11 +108,13 @@ function Gallery() {
   }, []);
 
   const handleGalleryList = async (e) => {
+    setLoading(true);
     const res = await getGalleryList();
     if (res.status) {
       const data = res.data;
       setGallery(data);
     }
+    setLoading(false);
   };
 
   const handleDelete = async (e) => {
@@ -156,7 +158,9 @@ function Gallery() {
                     <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} className="me-1" /> Add
                   </Link>
                 </div>
-                {(gallery && <CustomDataTable rows={gallery} columns={columns} options={options} />) || <TableLoader />}
+                {(!loading && gallery && <CustomDataTable rows={gallery} columns={columns} options={options} />) || (
+                  <TableLoader />
+                )}
               </Card.Body>
             </Card>
           </Col>

@@ -20,21 +20,15 @@ const links = [
 ];
 
 function SidebarLink({ href, label, iconSrc, tokenKey }) {
-  const token = Cookies.get('yks_fanzone_central_permissions');
-
   const router = useRouter();
-
-  let isActive = '';
-
-  if (href === '/') {
-    isActive = (router.asPath === href && 'active') || '';
-  } else {
-    isActive = (router.asPath.startsWith(href) && 'active') || '';
-  }
+  const token = Cookies.get('yks_fanzone_central_permissions');
+  const tokenValues = token?.split(',');
+  const hasPermission = (key) => tokenValues?.some((value) => value.includes(key));
+  const isActive = router.asPath === href || (href !== '/' && router.asPath.startsWith(href)) ? 'active' : '';
 
   return (
     <>
-      {/* {token?.includes(tokenKey) && ( */}
+      {/* {hasPermission(tokenKey) && ( */}
         <li className="my-3">
           <Link href={href}>
             <div className={`fw-medium side_link slate_gray rounded-2 ${isActive}`}>
