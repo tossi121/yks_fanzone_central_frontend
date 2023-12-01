@@ -252,7 +252,7 @@ function PressReleaseEdit({ id }) {
                         <Form.Check
                           inline
                           className="fs_14 slate_gray"
-                          label="Published"
+                          label="Publish"
                           type="radio"
                           id="Published"
                           value="Published"
@@ -263,7 +263,7 @@ function PressReleaseEdit({ id }) {
                         <Form.Check
                           inline
                           className="fs_14 slate_gray"
-                          label="Unpublished"
+                          label="Unpublish"
                           type="radio"
                           id="Unpublished"
                           value="Unpublished"

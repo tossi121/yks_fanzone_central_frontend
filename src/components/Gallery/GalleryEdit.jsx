@@ -175,7 +175,7 @@ function GalleryEdit({ id }) {
 
     addImageFile.forEach((file, index) => {
       if (file.size > 10 * 1024 * 1024) {
-        errors.addImageFile = `File size should be 1 MB or less`;
+        errors.addImageFile = `File size should be 10 MB or less`;
       }
     });
 
@@ -220,7 +220,7 @@ function GalleryEdit({ id }) {
                         <Form.Check
                           inline
                           className="fs_14 slate_gray"
-                          label="Published"
+                          label="Publish"
                           type="radio"
                           id="Published"
                           value="Published"
@@ -231,7 +231,7 @@ function GalleryEdit({ id }) {
                         <Form.Check
                           inline
                           className="fs_14 slate_gray"
-                          label="Unpublished"
+                          label="Unpublish"
                           type="radio"
                           id="Unpublished"
                           value="Unpublished"
