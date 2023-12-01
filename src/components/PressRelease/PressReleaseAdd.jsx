@@ -54,7 +54,7 @@ function PressReleaseAdd() {
 
       if (res?.status) {
         toast.success(res.message);
-        router.push('/');
+        router.push('/press-release');
       } else {
         toast.error(res?.message);
       }
