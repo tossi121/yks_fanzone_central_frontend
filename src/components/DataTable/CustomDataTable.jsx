@@ -16,8 +16,9 @@ const defaultProps = {
   pagination: true,
   sorting: true,
 };
+
 function CustomDataTable(props) {
-  const { rows, columns, options } = props;
+  const { rows, columns, options, setCurrentPage, currentPage } = props;
   const [cols, setCols] = useState(null);
   const [currentData, setCurrentData] = useState([]);
   const [currentPageSize, setCurrentPageSize] = useState(10);
@@ -334,6 +335,8 @@ function CustomDataTable(props) {
                 setCurrentData={setCurrentData}
                 setNumData={setNumData}
                 setNumFirst={setNumFirst}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
               />
             </div>
           )}

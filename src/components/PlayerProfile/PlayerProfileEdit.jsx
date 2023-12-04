@@ -39,6 +39,8 @@ function PlayerProfileEdit({ id }) {
   const [thumbnailError, setThumbnailError] = useState(null);
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const router = useRouter();
+  const { page } = router?.query;
+  const path = `/player-profile?page=${page}`;
 
   useEffect(() => {
     if (playerProfileId) {
@@ -115,7 +117,7 @@ function PlayerProfileEdit({ id }) {
 
       if (res?.status) {
         toast.success(res.message);
-        router.push('/player-profile');
+        router.push(path);
       } else {
         toast.error(res?.message);
       }

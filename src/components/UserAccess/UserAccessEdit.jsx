@@ -28,6 +28,8 @@ function UserAccessEdit({ id }) {
   const [currentUserData, setCurrentUserData] = useState(null);
   const [passwordShown, setPasswordShown] = useState(false);
   const router = useRouter();
+  const { page } = router?.query;
+  const path = `/user-access?page=${page}`;
 
   const togglePassword = () => {
     setPasswordShown(!passwordShown);
@@ -90,7 +92,7 @@ function UserAccessEdit({ id }) {
 
       if (res?.status) {
         toast.success(res.message);
-        router.push('/user-access');
+        router.push(path);
       } else {
         toast.error(res?.message);
       }

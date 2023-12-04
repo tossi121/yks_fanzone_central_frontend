@@ -3,6 +3,7 @@ import { faEdit, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Badge, Card, Col, Container, Row } from 'react-bootstrap';
 import toast from 'react-hot-toast';
@@ -16,6 +17,11 @@ function UserAccess() {
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const router = useRouter();
+  const { page } = router.query;
+
   const columns = [
     { heading: 'Id', field: 'serialNumber' },
     { heading: 'First Name', field: 'first_name' },
@@ -28,7 +34,7 @@ function UserAccess() {
 
   useEffect(() => {
     handleUserAccessList();
-  }, []);
+  }, [currentPage]);
 
   const handleUserAccessList = async (e) => {
     setLoading(true);
@@ -59,7 +65,7 @@ function UserAccess() {
     return (
       <>
         <div className="action_btn text-nowrap">
-          <Link href={`user-access/${row.id}`}>
+          <Link href={`user-access/${row.id}?page=${currentPage}`}>
             <FontAwesomeIcon
               title="Edit"
               icon={faEdit}
@@ -136,7 +142,13 @@ function UserAccess() {
                 </div>
 
                 {(!loading && userAccess && (
-                  <CustomDataTable rows={userAccess} columns={columns} options={options} />
+                  <CustomDataTable
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    rows={userAccess}
+                    columns={columns}
+                    options={options}
+                  />
                 )) || <TableLoader />}
               </Card.Body>
             </Card>

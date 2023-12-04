@@ -8,6 +8,7 @@ import { faEdit, faImage, faPlusCircle, faTrash } from '@fortawesome/free-solid-
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 const DeleteModal = dynamic(import('../DeleteModal'));
@@ -18,6 +19,18 @@ function Gallery() {
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const router = useRouter();
+  const { page } = router.query;
+
+  useEffect(() => {
+    if (page) {
+      setCurrentPage(Number(page));
+      router.replace('/gallery');
+    }
+  }, [page]);
+
   const columns = [
     { heading: 'Id', field: 'serialNumber' },
     { heading: 'Thumbnail Image', field: 'thumbnailImage' },
@@ -57,7 +70,7 @@ function Gallery() {
     return (
       <>
         <div className="action_btn text-nowrap">
-          <Link href={`gallery/${row.id}`}>
+          <Link href={`gallery/${row.id}?page=${currentPage}`}>
             <FontAwesomeIcon
               title="Edit"
               icon={faEdit}
@@ -106,7 +119,7 @@ function Gallery() {
 
   useEffect(() => {
     handleGalleryList();
-  }, []);
+  }, [currentPage]);
 
   const handleGalleryList = async (e) => {
     setLoading(true);
@@ -159,9 +172,15 @@ function Gallery() {
                     <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} className="me-1" /> Add
                   </Link>
                 </div>
-                {(!loading && gallery && <CustomDataTable rows={gallery} columns={columns} options={options} />) || (
-                  <TableLoader />
-                )}
+                {(!loading && gallery && (
+                  <CustomDataTable
+                    rows={gallery}
+                    columns={columns}
+                    options={options}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                  />
+                )) || <TableLoader />}
               </Card.Body>
             </Card>
           </Col>

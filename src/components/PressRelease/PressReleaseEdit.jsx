@@ -18,6 +18,7 @@ const ImageLoader = dynamic(import('../DataTable/ImageLoader'));
 
 function PressReleaseEdit({ id }) {
   const pressReleaseId = id;
+
   const [formValues, setFormValues] = useState({ title: '', edition: '', status: 'Published' });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,8 @@ function PressReleaseEdit({ id }) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const router = useRouter();
 
+  const { page } = router?.query;
+  const path = `/press-release?page=${page}`;
   useEffect(() => {
     if (pressReleaseId) {
       handleTournamentList();
@@ -93,7 +96,7 @@ function PressReleaseEdit({ id }) {
 
       if (res?.status) {
         toast.success(res.message);
-        router.push('/press-release');
+        router.push(path);
       } else {
         toast.error(res?.message);
       }

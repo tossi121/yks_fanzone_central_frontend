@@ -32,6 +32,8 @@ function GalleryEdit({ id }) {
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
   const router = useRouter();
+  const { page } = router?.query;
+  const path = `/gallery?page=${page}`;
 
   useEffect(() => {
     if (galleryId) {
@@ -241,7 +243,7 @@ function GalleryEdit({ id }) {
 
       if (res?.status) {
         toast.success(res.message);
-        router.push('/gallery');
+        router.push(path);
       } else {
         toast.error(res?.message);
       }

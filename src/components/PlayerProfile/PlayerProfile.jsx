@@ -5,6 +5,7 @@ import moment from 'moment';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 
@@ -14,6 +15,17 @@ const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 function PlayerProfile() {
   const [playerProfile, setPlayerProfile] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const { page } = router.query;
+
+  useEffect(() => {
+    if (page) {
+      setCurrentPage(Number(page));
+      router.replace('/player-profile');
+    }
+  }, [page]);
+
   const columns = [
     { heading: 'Id', field: 'serialNumber' },
     { heading: 'Profile', field: 'profile_url' },
@@ -32,7 +44,7 @@ function PlayerProfile() {
   ];
   useEffect(() => {
     handlePlayerList();
-  }, []);
+  }, [currentPage]);
 
   const options = {
     columns: {
@@ -68,7 +80,7 @@ function PlayerProfile() {
     return (
       <>
         <div className="action_btn text-nowrap">
-          <Link href={`player-profile/${row.id}`}>
+          <Link href={`player-profile/${row.id}?page=${currentPage}`}>
             <FontAwesomeIcon
               title="Edit"
               icon={faEdit}
@@ -93,7 +105,13 @@ function PlayerProfile() {
                   <h4 className="fw-bold mb-0">Player Profile</h4>
                 </div>
                 {(!loading && playerProfile && (
-                  <CustomDataTable rows={playerProfile} columns={columns} options={options} />
+                  <CustomDataTable
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    rows={playerProfile}
+                    columns={columns}
+                    options={options}
+                  />
                 )) || <TableLoader />}
               </Card.Body>
             </Card>

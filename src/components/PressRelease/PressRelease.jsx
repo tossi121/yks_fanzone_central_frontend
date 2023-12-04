@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { faEdit, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
 
 const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 const DeleteModal = dynamic(import('../DeleteModal'));
@@ -17,6 +18,17 @@ function PressRelease() {
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const { page } = router.query;
+
+  useEffect(() => {
+    if (page) {
+      setCurrentPage(Number(page));
+      router.replace('/press-release');
+    }
+  }, [page]);
+
   const columns = [
     { heading: 'Id', field: 'serialNumber' },
     { heading: 'Title', field: 'title' },
@@ -45,8 +57,9 @@ function PressRelease() {
     };
     return (
       <>
+        {console.log(currentPage, 'currentPage')}
         <div className="action_btn text-nowrap">
-          <Link href={`press-release/${row.id}`}>
+          <Link href={`press-release/${row.id}?page=${currentPage}`}>
             <FontAwesomeIcon
               title="Edit"
               icon={faEdit}
@@ -93,7 +106,7 @@ function PressRelease() {
 
   useEffect(() => {
     handlePressReleasesList();
-  }, []);
+  }, [currentPage]);
 
   const handlePressReleasesList = async (e) => {
     setLoading(true);
@@ -104,7 +117,6 @@ function PressRelease() {
     }
     setLoading(false);
   };
-
 
   const handleDelete = async (e) => {
     const params = {
@@ -149,7 +161,13 @@ function PressRelease() {
                 </div>
 
                 {(!loading && pressReleases && (
-                  <CustomDataTable rows={pressReleases} columns={columns} options={options} />
+                  <CustomDataTable
+                    rows={pressReleases}
+                    columns={columns}
+                    options={options}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                  />
                 )) || <TableLoader />}
               </Card.Body>
             </Card>
