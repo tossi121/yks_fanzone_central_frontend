@@ -17,6 +17,7 @@ function UserAccess() {
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
   const columns = [
+    { heading: 'Id', field: 'serialNumber' },
     { heading: 'First Name', field: 'first_name' },
     { heading: 'Last Name', field: 'last_name' },
     { heading: 'Email', field: 'email' },

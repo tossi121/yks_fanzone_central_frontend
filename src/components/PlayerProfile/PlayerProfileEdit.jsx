@@ -211,33 +211,29 @@ function PlayerProfileEdit({ id }) {
       errors.bio = 'Please enter bio';
     }
     if (!thumbnailFile) {
-      errors.thumbnailFile = 'Please profile picture';
+      errors.thumbnailFile = 'Please upload profile picture';
     } else if (thumbnailFile.size > 10 * 1024 * 1024) {
       errors.thumbnailFile = 'File size should be 10 MB or less';
     }
 
     if (!values.skills) {
-      errors.skills = 'Please enter a skills';
+      errors.skills = 'Please enter skills';
     }
 
     if (selectedItems == null || selectedItems.length === 0) {
-      errors.position = 'Please select a position';
+      errors.position = 'Please select position';
     }
 
     if (!values.category) {
-      errors.category = 'Please select a category';
+      errors.category = 'Please select category';
     }
 
     if (!dob) {
-      errors.dob = 'Please select a date of birth';
+      errors.dob = 'Please select date of birth';
     }
 
-    if (!yearsActiveStart) {
-      errors.yearsActiveStart = 'Please select a years active start';
-    }
-
-    if (!yearsActiveEnd) {
-      errors.yearsActiveEnd = 'Please select a years active end';
+    if (!yearsActiveStart || !yearsActiveEnd) {
+      errors.yearsActiveStart = 'Please select years active start and end';
     }
 
     return errors;
@@ -499,6 +495,9 @@ function PlayerProfileEdit({ id }) {
                           showYearPicker
                           maxDate={new Date()}
                         />
+                        {formErrors.yearsActiveStart && (
+                          <p className="text-danger fs_13 mt-1">{formErrors.yearsActiveStart}</p>
+                        )}
                       </div>
                     </Col>
                     <Col lg={6}>

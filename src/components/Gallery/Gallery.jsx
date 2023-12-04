@@ -19,6 +19,7 @@ function Gallery() {
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
   const columns = [
+    { heading: 'Id', field: 'serialNumber' },
     { heading: 'Thumbnail Image', field: 'thumbnailImage' },
     { heading: 'Title', field: 'name_of_group' },
     { heading: 'Description', field: 'description_of_gallery' },

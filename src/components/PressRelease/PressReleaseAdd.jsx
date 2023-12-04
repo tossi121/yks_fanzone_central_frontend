@@ -156,7 +156,7 @@ function PressReleaseAdd() {
     const errors = {};
 
     if (!values.title) {
-      errors.title = 'Please enter title ';
+      errors.title = 'Please enter title';
     }
     if (!values.edition) {
       errors.edition = 'Please select edition';

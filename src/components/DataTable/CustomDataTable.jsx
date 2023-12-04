@@ -237,7 +237,7 @@ function CustomDataTable(props) {
   function selectBox() {
     return (
       <>
-        <div className="form-group me-4 fs_14 fw-medium slate_gray mb-3 mb-sm-0">
+        <div className="form-group fs_14 fw-medium slate_gray mb-3 mb-sm-0">
           Show{' '}
           <select
             className="border rounded-1 cursor_pointer px-2 py-1 mx-1 slate_gray"
@@ -306,11 +306,11 @@ function CustomDataTable(props) {
             )}
           </Table>
         </div>
-        <div className="align-items-center justify-content-between justify-content-center d-flex flex-wrap">
+        <div className="align-items-center mt-3 mt-lg-0 justify-content-sm-between justify-content-center d-flex flex-wrap">
           {currentData.length > 0 && entity?.info && (
             <>
               {(rows?.length > 10 && (
-                <p className="mb-lg-0 mt-sm-0 mt-3 fw-medium slate_gray fs_14">
+                <p className="mb-sm-0 fw-medium slate_gray fs_14">
                   Showing {numFirst} to{' '}
                   <span className="fw-medium slate_gray">
                     {(numData > currentData.length && numFirst == 1 && currentData.length) || numData}{' '}
@@ -318,7 +318,7 @@ function CustomDataTable(props) {
                   of {filterData.length} entries
                 </p>
               )) || (
-                <p className="mb-0 fw-medium slate_gray">
+                <p className="mb-sm-0 fw-medium slate_gray fs_14">
                   Showing {numFirst} to <span className="fw-medium slate_gray">{currentData.length}</span> of{' '}
                   {filterData.length} entries
                 </p>
