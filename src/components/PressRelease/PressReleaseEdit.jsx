@@ -187,13 +187,13 @@ function PressReleaseEdit({ id }) {
     const errors = {};
 
     if (!values.title) {
-      errors.title = 'Please enter a title ';
+      errors.title = 'Please enter title ';
     }
     if (!values.edition) {
-      errors.edition = 'Please select a edition';
+      errors.edition = 'Please select edition';
     }
     if (!publishDate) {
-      errors.publishDate = 'Please select a publish date';
+      errors.publishDate = 'Please select publish date';
     }
     if (!thumbnailFile) {
       errors.thumbnailFile = 'Please upload a thumbnail';
@@ -202,7 +202,7 @@ function PressReleaseEdit({ id }) {
     }
 
     if (!pdfFile) {
-      errors.pdfFile = 'Please upload a pdf ';
+      errors.pdfFile = 'Please upload pdf ';
     }
 
     return errors;

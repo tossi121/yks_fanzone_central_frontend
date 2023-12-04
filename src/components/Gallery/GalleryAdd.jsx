@@ -179,19 +179,19 @@ function GalleryAdd() {
       }
     } else {
       if (!values.title) {
-        errors.title = 'Please enter a title';
+        errors.title = 'Please enter title';
       }
       if (!publishDate) {
-        errors.publishDate = 'Please select a publish date';
+        errors.publishDate = 'Please select publish date';
       }
       if (!values.description) {
-        errors.description = 'Please enter a description';
+        errors.description = 'Please enter description';
       } else if (values.description.length > 150) {
         errors.description = 'Description should be 150 characters or less';
       }
 
       if (!thumbnailFile) {
-        errors.thumbnailFile = 'Please upload a thumbnail';
+        errors.thumbnailFile = 'Please upload thumbnail';
       }
       if (addImageFile.length === 0) {
         errors.addImageFile = 'Please upload at least one image';

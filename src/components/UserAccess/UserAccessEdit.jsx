@@ -112,25 +112,25 @@ function UserAccessEdit({ id }) {
     }
 
     if (!values.email) {
-      errors.email = 'Please enter an email address';
+      errors.email = 'Please enter email address';
     } else if (!validEmail(values.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = 'Please enter valid email address';
     }
 
     if (!values.firstName) {
-      errors.firstName = 'Please enter a first name';
+      errors.firstName = 'Please enter first name';
     } else if (!validName(values.firstName)) {
-      errors.firstName = 'Please enter a valid first name';
+      errors.firstName = 'Please enter valid first name';
     }
 
     if (!values.lastName) {
-      errors.lastName = 'Please enter a last name';
+      errors.lastName = 'Please enter last name';
     } else if (!validName(values.lastName)) {
-      errors.lastName = 'Please enter a valid last name';
+      errors.lastName = 'Please enter valid last name';
     }
 
     if (!values.password) {
-      errors.password = 'Please enter a password';
+      errors.password = 'Please enter password';
     } else if (values.password.length < 6) {
       errors.password = 'Password length should be at least 6 characters';
     }

@@ -306,7 +306,7 @@ function CustomDataTable(props) {
             )}
           </Table>
         </div>
-        <div className="align-items-center justify-content-lg-between justify-content-center d-flex flex-wrap">
+        <div className="align-items-center justify-content-between justify-content-center d-flex flex-wrap">
           {currentData.length > 0 && entity?.info && (
             <>
               {(rows?.length > 10 && (

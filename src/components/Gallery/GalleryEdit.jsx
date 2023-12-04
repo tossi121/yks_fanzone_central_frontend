@@ -254,7 +254,7 @@ function GalleryEdit({ id }) {
     const errors = {};
 
     if (!values.title) {
-      errors.title = 'Please enter a title';
+      errors.title = 'Please enter title';
     }
 
     if (values.status == 'Draft') {
@@ -262,15 +262,15 @@ function GalleryEdit({ id }) {
     }
 
     if (!values.description) {
-      errors.description = 'Please enter a description';
+      errors.description = 'Please enter description';
     } else if (values.description.length > 150) {
       errors.description = 'Description should be 150 characters or less';
     }
     if (!publishDate) {
-      errors.publishDate = 'Please select a publish date';
+      errors.publishDate = 'Please select publish date';
     }
     if (!thumbnailFile) {
-      errors.thumbnailFile = 'Please upload a thumbnail';
+      errors.thumbnailFile = 'Please upload thumbnail';
     } else if (thumbnailFile.size > 10 * 1024 * 1024) {
       errors.thumbnailFile = 'File size should be 10 MB or less';
     }

@@ -193,22 +193,22 @@ function PlayerProfileEdit({ id }) {
     const errors = {};
 
     if (!values.playerName) {
-      errors.playerName = 'Please enter a name';
+      errors.playerName = 'Please enter name';
     }
 
     if (!values.nickName) {
-      errors.nickName = 'Please enter a nick name';
+      errors.nickName = 'Please enter nick name';
     }
 
     if (!values.height) {
-      errors.height = 'Please enter a height';
+      errors.height = 'Please enter height';
     }
 
     if (!values.country) {
-      errors.country = 'Please enter a country';
+      errors.country = 'Please enter country';
     }
     if (!values.bio) {
-      errors.bio = 'Please enter a bio';
+      errors.bio = 'Please enter bio';
     }
     if (!thumbnailFile) {
       errors.thumbnailFile = 'Please profile picture';

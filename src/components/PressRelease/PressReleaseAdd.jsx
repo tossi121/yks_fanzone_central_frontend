@@ -156,23 +156,23 @@ function PressReleaseAdd() {
     const errors = {};
 
     if (!values.title) {
-      errors.title = 'Please enter a title ';
+      errors.title = 'Please enter title ';
     }
     if (!values.edition) {
-      errors.edition = 'Please select a edition';
+      errors.edition = 'Please select edition';
     }
     if (!publishDate) {
-      errors.publishDate = 'Please select a publish date';
+      errors.publishDate = 'Please select publish date';
     }
 
     if (!thumbnailFile) {
-      errors.thumbnailFile = 'Please upload a thumbnail';
+      errors.thumbnailFile = 'Please upload thumbnail';
     } else if (thumbnailFile.size > 10 * 1024 * 1024) {
       errors.thumbnailFile = 'File size should be 10 MB or less';
     }
 
     if (!pdfFile) {
-      errors.pdfFile = 'Please upload a pdf ';
+      errors.pdfFile = 'Please upload pdf ';
     }
 
     return errors;

@@ -55,13 +55,13 @@ function Login() {
     const errors = {};
 
     if (!values.email) {
-      errors.email = 'Please enter an email address';
+      errors.email = 'Please enter email address';
     } else if (!validEmail(values.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = 'Please enter valid email address';
     }
 
     if (!values.password) {
-      errors.password = 'Please enter a password';
+      errors.password = 'Please enter password';
     } else if (values.password.length < 6) {
       errors.password = 'Password length should be at least 6 characters';
     }
