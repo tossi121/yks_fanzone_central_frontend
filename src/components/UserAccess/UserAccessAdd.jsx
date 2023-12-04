@@ -149,7 +149,7 @@ function UserAccessAdd() {
                             placeholder="Enter First Name"
                             name="firstName"
                             className="shadow-none fs_14 slate_gray"
-                            value={formValues.firstName}
+                            value={formValues.firstName.trimStart().replace(/  +/g, ' ')}
                             onChange={handleChange}
                           />
                           {formErrors.firstName && <p className="text-danger fs_13 mt-1">{formErrors.firstName}</p>}
@@ -165,7 +165,7 @@ function UserAccessAdd() {
                             placeholder="Enter Last Name"
                             name="lastName"
                             className="shadow-none fs_14 slate_gray"
-                            value={formValues.lastName}
+                            value={formValues.lastName.trimStart().replace(/  +/g, ' ')}
                             onChange={handleChange}
                           />
                           {formErrors.lastName && <p className="text-danger fs_13 mt-1">{formErrors.lastName}</p>}
@@ -181,7 +181,7 @@ function UserAccessAdd() {
                             placeholder="Enter Email"
                             name="email"
                             className="shadow-none fs_14 slate_gray"
-                            value={formValues.email}
+                            value={formValues.email.replace(/\s+/g, '')}
                             onChange={handleChange}
                           />
                           {formErrors.email && <p className="text-danger fs_13 mt-1">{formErrors.email}</p>}
@@ -197,7 +197,7 @@ function UserAccessAdd() {
                             placeholder="Enter Password"
                             name="password"
                             className="shadow-none fs_14 slate_gray"
-                            value={formValues.password}
+                            value={formValues.password.replace(/\s+/g, '')}
                             onChange={handleChange}
                           />
 
@@ -227,10 +227,11 @@ function UserAccessAdd() {
                         <Form.Label className="blue_dark fw-medium">Select Permissions</Form.Label>
                         <Form.Group>
                           {userPermissions.map((item, key) => (
-                            <React.Fragment key={key}>
+                            <>
                               <Form.Label
-                                className="cursor_pointer slate_gray fs_14 user-select-none me-3"
+                                className="cursor_pointer slate_gray fs_14 user-select-none me-3 text-capitalize"
                                 htmlFor={item.permissions}
+                                key={key}
                               >
                                 <input
                                   type="checkbox"
@@ -240,9 +241,9 @@ function UserAccessAdd() {
                                   checked={formValues.role.includes(item.permissions)}
                                   onChange={() => handleRoleChange(item.permissions)}
                                 />
-                                {item.permissions}
+                                {item.permissions.replace(/[-_]/g, ' ')}
                               </Form.Label>
-                            </React.Fragment>
+                            </>
                           ))}
                         </Form.Group>
                         {formErrors.role && <p className="text-danger fs_13 mt-1">{formErrors.role}</p>}

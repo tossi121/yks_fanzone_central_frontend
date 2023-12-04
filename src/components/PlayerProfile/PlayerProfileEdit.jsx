@@ -1,11 +1,14 @@
 import { currentPlayerProfile, updatePlayerProfile } from '@/_services/services_api';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import moment from 'moment';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Container, Dropdown, Form, Row, Spinner } from 'react-bootstrap';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
@@ -15,11 +18,11 @@ function PlayerProfileEdit({ id }) {
   const [formValues, setFormValues] = useState({
     playerName: '',
     nickName: '',
-    position: '',
     height: '',
     country: '',
     skills: '',
     bio: '',
+    category: '',
   });
   const [yearsActiveStart, setYearsActiveStart] = useState(null);
   const [yearsActiveEnd, setYearsActiveEnd] = useState(null);
@@ -28,6 +31,9 @@ function PlayerProfileEdit({ id }) {
   const [dob, setDob] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [position, setPosition] = useState(false);
 
   useEffect(() => {
     if (playerProfileId) {
@@ -48,13 +54,17 @@ function PlayerProfileEdit({ id }) {
       const values = {
         playerName: currentPlayer?.name || '',
         nickName: currentPlayer?.nick_name || '',
-        position: currentPlayer?.position || '',
         height: currentPlayer?.height || '',
         country: currentPlayer?.home_town || '',
         skills: currentPlayer?.skill || '',
         bio: currentPlayer?.bio || '',
+        category: currentPlayer?.category || '',
       };
+
       setFormValues(values);
+      const playerPosition = currentPlayer?.position_name;
+      setSelectedItems(playerPosition);
+      setThumbnailFile(thumbnailFile != null && currentPlayer?.profile_url);
       const yearsActive = currentPlayer?.years_active;
       if (yearsActive) {
         const [startYear, endYear] = yearsActive.split('-');
@@ -83,11 +93,13 @@ function PlayerProfileEdit({ id }) {
     if (Object.keys(errors).length === 0) {
       const yearsActive = moment(yearsActiveStart).format('YYYY') + '-' + moment(yearsActiveEnd).format('YYYY');
       const params = {
-        name: formValues.name,
-        nick_name: formValues.nickName,
-        position: formValues.position,
+        profile_url: thumbnailFile,
+        name: formValues.playerName,
+        short_name: formValues.nickName,
+        category: formValues.category,
+        position_name: selectedItems,
         date_of_birth: moment(dob).format('YYYY-MM-DD'),
-        home_town: formValues.country,
+        country_name: formValues.country,
         height: formValues.height,
         years_active: yearsActive,
         skill: formValues.skills,
@@ -111,6 +123,51 @@ function PlayerProfileEdit({ id }) {
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
+  const createFormData = (file, folderName) => {
+    const formData = new FormData();
+    formData.append('folderName', folderName);
+    formData.append('files', file);
+    return formData;
+  };
+
+  const getHeaders = () => {
+    return {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${Cookies.get('yks_fanzone_central_token')}`,
+    };
+  };
+
+  const handleUpload = async (file, setFile) => {
+    try {
+      const folderName = setFile === setThumbnailFile ? 'yks/player_profile' : '';
+      const formData = createFormData(file, folderName);
+      const headers = getHeaders();
+
+      const response = await axios.post(
+        `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
+        formData,
+        { headers }
+      );
+
+      if (response?.data?.status) {
+        setTimeout(() => {
+          setFile(response?.data?.result[0]);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(`Error uploading ${setFile === setThumbnailFile ? 'thumbnail' : 'pdf'} file:`, error);
+    }
+  };
+
+  const handleFileClick = (event, setFile) => {
+    const file = event.target.files[0];
+    handleUpload(file, setFile);
+  };
+
+  const handleThumbnailClick = (event) => {
+    handleFileClick(event, setThumbnailFile);
+  };
+
   const formValidation = (values) => {
     const errors = {};
 
@@ -122,16 +179,44 @@ function PlayerProfileEdit({ id }) {
       errors.nickName = 'Please enter a nick name';
     }
 
+    if (!values.height) {
+      errors.height = 'Please enter a height';
+    }
+
     if (!values.country) {
       errors.country = 'Please enter a country';
     }
+    if (!values.bio) {
+      errors.bio = 'Please enter a bio';
+    }
+    if (!thumbnailFile) {
+      errors.thumbnailFile = 'Please upload a thumbnail';
+    } else if (thumbnailFile.size > 10 * 1024 * 1024) {
+      errors.thumbnailFile = 'File size should be 10 MB or less';
+    }
 
-    if (!values.position) {
-      errors.position = 'Please enter a position';
+    if (!values.skills) {
+      errors.skills = 'Please enter a skills';
+    }
+
+    if (selectedItems == null || selectedItems.length === 0) {
+      errors.position = 'Please select a position';
+    }
+
+    if (!values.category) {
+      errors.category = 'Please select a category';
     }
 
     if (!dob) {
       errors.dob = 'Please select a date of birth';
+    }
+
+    if (!yearsActiveStart) {
+      errors.yearsActiveStart = 'Please select a years active start';
+    }
+
+    if (!yearsActiveEnd) {
+      errors.yearsActiveEnd = 'Please select a years active end';
     }
 
     return errors;
@@ -142,6 +227,32 @@ function PlayerProfileEdit({ id }) {
     setYearsActiveStart(start);
     setYearsActiveEnd(end);
   };
+
+  const dropdownMenu = [
+    {
+      Raider: ['Right Raider', 'Left Raider'],
+      Defender: ['Left Corner', 'Left Cover', 'Right Cover', 'Right Corner'],
+    },
+  ];
+
+  const handleCheckboxChange = (option) => {
+    setSelectedItems((prevSelected) => {
+      const isSelected = Array.isArray(prevSelected) && prevSelected.includes(option);
+
+      if (isSelected) {
+        setPosition(false);
+        return prevSelected.filter((item) => item !== option);
+      } else {
+        setPosition(true);
+        return [...(Array.isArray(prevSelected) ? prevSelected : []), option];
+      }
+    });
+  };
+
+  const selectedOptions =
+    formValues.category === 'All_Rounder'
+      ? dropdownMenu.flatMap((item) => Object.values(item).flat())
+      : (dropdownMenu.find((item) => item[formValues.category]) || {})[formValues.category] || [];
 
   return (
     <>
@@ -158,7 +269,51 @@ function PlayerProfileEdit({ id }) {
                   <h4 className="fw-bold mb-0">Edit Player Profile</h4>
                 </div>
                 <Form autoComplete="off" className="mt-3" onSubmit={handleSubmit}>
-                  <Row className="align-items-center">
+                  <Row className="align-items-baseline">
+                    <Col lg={6}>
+                      <Form.Label className="blue_dark fw-medium">Player Profile</Form.Label>
+                      <div className="mb-3">
+                        <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
+                          {(thumbnailFile && (
+                            <>
+                              <Link
+                                target="_blank"
+                                className="cursor_pointer"
+                                href={process.env.IMAGE_BASE + thumbnailFile}
+                              >
+                                <Image
+                                  src={process.env.IMAGE_BASE + thumbnailFile}
+                                  alt="thumbnail"
+                                  height={150}
+                                  width={150}
+                                  className="rounded-3 mb-2"
+                                />
+                              </Link>
+                            </>
+                          )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
+                          <div>
+                            <Form.Control
+                              type="file"
+                              id="thumbnail"
+                              onChange={handleThumbnailClick}
+                              accept="image/png, image/jpeg, image/jpg, image/svg+xml"
+                              className="d-none"
+                              aria-describedby="thumbnail"
+                            />
+                            <label
+                              className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                              htmlFor="thumbnail"
+                            >
+                              <span className="d-inline-flex align-middle">Player Profile </span>
+                            </label>
+                          </div>
+                        </div>
+                        {formErrors.thumbnailFile && (
+                          <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
+                        )}
+                      </div>
+                    </Col>
+
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group>
@@ -175,6 +330,7 @@ function PlayerProfileEdit({ id }) {
                         </Form.Group>
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group>
@@ -191,22 +347,61 @@ function PlayerProfileEdit({ id }) {
                         </Form.Group>
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group>
-                          <Form.Label className="blue_dark fw-medium">Enter Position</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter Position"
-                            name="position"
-                            className="shadow-none fs_14 slate_gray"
-                            value={formValues.position}
+                          <Form.Label className="blue_dark fw-medium">Select Position Category </Form.Label>
+                          <Form.Select
+                            name="category"
+                            value={formValues.category}
                             onChange={handleChange}
-                          />
+                            className="shadow-none fs_14 slate_gray form-control cursor_pointer"
+                          >
+                            <option>Select Position Category</option>
+                            <option value={'Raider'}>Raider</option>
+                            <option value={'Defender'}>Defender</option>
+                            <option value={'All_Rounder'}>All Rounder</option>
+                          </Form.Select>
+                          {formErrors.category && <p className="text-danger fs_13 mt-1">{formErrors.category}</p>}
+                        </Form.Group>
+                      </div>
+                    </Col>
+                    <Col lg={6}>
+                      <div className="mb-3">
+                        <Form.Group>
+                          <Form.Label className="blue_dark fw-medium">Select Position </Form.Label>
+                          <Dropdown className="w-100 rounded-1">
+                            <Dropdown.Toggle
+                              variant=""
+                              className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                              id="dropdown-basic"
+                              disabled={selectedOptions == null || selectedOptions.length == 0}
+                            >
+                              {(!position && 'Select Position') || selectedItems}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu className="w-100">
+                              {selectedOptions.map((option, index) => (
+                                <div key={index} className="d-flex align-items-center dropdown-item w-100">
+                                  <input
+                                    type="checkbox"
+                                    id={index}
+                                    checked={selectedItems?.includes(option)}
+                                    onChange={() => handleCheckboxChange(option)}
+                                    className="cursor_pointer"
+                                  />
+                                  <label htmlFor={index} className="ms-3 cursor_pointer user-select-none w-100">
+                                    {option}
+                                  </label>
+                                </div>
+                              ))}
+                            </Dropdown.Menu>
+                          </Dropdown>
                           {formErrors.position && <p className="text-danger fs_13 mt-1">{formErrors.position}</p>}
                         </Form.Group>
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Select Date of Birth</Form.Label>
                       <div className="mb-3 d-flex flex-column">
@@ -256,6 +451,7 @@ function PlayerProfileEdit({ id }) {
                             value={formValues.height}
                             onChange={handleChange}
                           />
+                          {formErrors.height && <p className="text-danger fs_13 mt-1">{formErrors.height}</p>}
                         </Form.Group>
                       </div>
                     </Col>
@@ -290,6 +486,7 @@ function PlayerProfileEdit({ id }) {
                             value={formValues.skills}
                             onChange={handleChange}
                           />
+                          {formErrors.skills && <p className="text-danger fs_13 mt-1">{formErrors.skills}</p>}
                         </Form.Group>
                       </div>
                     </Col>
@@ -305,6 +502,7 @@ function PlayerProfileEdit({ id }) {
                             className="shadow-none fs_14 slate_gray textarea_description"
                             placeholder="Boi of the player"
                           />
+                          {formErrors.bio && <p className="text-danger fs_13 mt-1">{formErrors.bio}</p>}
                         </Form.Group>
                       </div>
                     </Col>

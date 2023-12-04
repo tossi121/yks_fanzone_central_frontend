@@ -105,7 +105,6 @@ function PressRelease() {
     setLoading(false);
   };
 
-  console.log(loading);
 
   const handleDelete = async (e) => {
     const params = {

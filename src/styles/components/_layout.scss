@@ -11,7 +11,7 @@
     span:hover {
       color: $purple !important;
     }
-    .dropdown-toggle::after{
+    .dropdown-toggle::after {
       border: unset !important;
     }
     .dropdown-item {
@@ -22,6 +22,11 @@
     }
   }
 }
+
+.dropdown-item:active{
+    background: #f8f9fa !important;
+    color: $blue-dark;
+  }
 
 .sidebar_section {
   z-index: 1;
@@ -69,4 +74,3 @@
     width: calc(100% - 64px) !important;
   }
 }
-

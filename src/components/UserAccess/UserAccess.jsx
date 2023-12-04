@@ -46,7 +46,8 @@ function UserAccess() {
   };
 
   function renderPermissions(value, row) {
-    return <span className="text-nowrap">{row.permissions.join(' , ')} </span>;
+    const permissions = row.permissions.join(' , ');
+    return <span className="text-nowrap text-capitalize">{permissions.replace(/[-_]/g, ' ')} </span>;
   }
 
   function renderActions(value, row) {

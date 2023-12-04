@@ -28,7 +28,7 @@ function SidebarLink({ href, label, iconSrc, tokenKey }) {
 
   return (
     <>
-      {/* {hasPermission(tokenKey) && ( */}
+      {hasPermission(tokenKey) && (
         <li className="my-3">
           <Link href={href}>
             <div className={`fw-medium side_link slate_gray rounded-2 ${isActive}`}>
@@ -37,7 +37,7 @@ function SidebarLink({ href, label, iconSrc, tokenKey }) {
             </div>
           </Link>
         </li>
-      {/* )} */}
+       )}
     </>
   );
 }

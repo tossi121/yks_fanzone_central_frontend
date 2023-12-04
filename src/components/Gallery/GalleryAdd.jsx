@@ -1,10 +1,10 @@
-import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faImage, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Container, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import Image from 'next/image';
 import { addGallery } from '@/_services/services_api';
 import toast from 'react-hot-toast';
@@ -20,6 +20,8 @@ function GalleryAdd() {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [addImageFile, setAddImageFile] = useState([]);
   const [publishDate, setPublishDate] = useState(null);
+  const [show, setShow] = useState(false);
+
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -28,9 +30,13 @@ function GalleryAdd() {
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
-  const createFormData = (files, folderName) => {
+  const createFormData = (files, folderName, existingFiles = []) => {
     const formData = new FormData();
     formData.append('folderName', folderName);
+
+    existingFiles.forEach((file, index) => {
+      formData.append(`files`, file);
+    });
 
     if (Array.isArray(files)) {
       files.forEach((file, index) => {
@@ -50,10 +56,10 @@ function GalleryAdd() {
     };
   };
 
-  const handleUpload = async (files, setFiles) => {
+  const handleUpload = async (files, setFiles, existingFiles = []) => {
     try {
-      const folderName = Array.isArray(files) ? 'yks/gallery-thumbnail' : 'yks/gallery-images';
-      const formData = createFormData(files, folderName);
+      const folderName = Array.isArray(files) ? 'yks/gallery-images' : 'yks/gallery-thumbnail';
+      const formData = createFormData(files, folderName, existingFiles); // Pass existingFiles
       const headers = getHeaders();
 
       const response = await axios.post(
@@ -64,22 +70,22 @@ function GalleryAdd() {
 
       if (response?.data?.status) {
         setTimeout(() => {
-          setFiles(response?.data?.result);
-        }, 500);
+          setFiles(existingFiles.concat(response?.data?.result));
+        }, 1000);
       }
     } catch (error) {
       console.error('Error uploading files:', error);
     }
   };
 
+  const handleAddImageClick = (event) => {
+    const files = Array.from(event.target.files);
+    handleUpload(files, setAddImageFile, addImageFile);
+  };
+
   const handleThumbnailClick = (event) => {
     const file = event.target.files[0];
     handleUpload(file, setThumbnailFile);
-  };
-
-  const handleAddImageClick = (event) => {
-    const files = Array.from(event.target.files);
-    handleUpload(files, setAddImageFile);
   };
 
   const handleSubmit = async (e) => {
@@ -133,26 +139,64 @@ function GalleryAdd() {
 
       if (!thumbnailFile) {
         errors.thumbnailFile = 'Please upload a thumbnail';
-      } else if (thumbnailFile.size > 10 * 1024 * 1024) {
-        errors.thumbnailFile = 'File size should be 10 MB or less';
       }
-
       if (addImageFile.length === 0) {
         errors.addImageFile = 'Please upload at least one image';
-      } else {
-        addImageFile.forEach((file) => {
-          if (file.size > 10 * 1024 * 1024) {
-            errors.addImageFile = 'File size should be 10 MB or less';
-          }
-        });
       }
     }
 
     return errors;
   };
 
+  const handleRemoveImage = (index, setFiles) => {
+    setFiles((prevFiles) => {
+      const updatedFiles = [...prevFiles];
+      updatedFiles.splice(index, 1);
+      return updatedFiles;
+    });
+  };
+
+  function ModalGallery() {
+    return (
+      <>
+        <Modal show={show} centered size="lg" onHide={() => setShow(false)}>
+          <Modal.Header closeButton></Modal.Header>
+          <Modal.Body>
+            <div className="d-flex flex-wrap align-items-center gap-3 justify-content-center">
+              {(addImageFile?.length > 0 &&
+                addImageFile.map((preview, index) => (
+                  <>
+                    <div className="position-relative">
+                      <Link target="_blank" className="cursor_pointer" href={process.env.IMAGE_BASE + preview}>
+                        <Image
+                          key={index}
+                          src={process.env.IMAGE_BASE + preview}
+                          alt={`Preview ${index}`}
+                          height={125}
+                          width={125}
+                          className="rounded-3 mb-2"
+                        />
+                      </Link>
+                      <FontAwesomeIcon
+                        icon={faTimes}
+                        onClick={() => handleRemoveImage(index, setAddImageFile)}
+                        className="slate_gray cursor_pointer rounded-4 border p-1 position-absolute z-1 bg-white remove_icon"
+                        width={25}
+                        height={25}
+                      />
+                    </div>
+                  </>
+                ))) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
+            </div>
+          </Modal.Body>
+        </Modal>
+      </>
+    );
+  }
+
   return (
     <>
+      {show && <ModalGallery />}
       <Container fluid>
         <Row>
           <Col>
@@ -183,7 +227,6 @@ function GalleryAdd() {
                         </Form.Group>
                       </div>
                     </Col>
-              
 
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Status</Form.Label>
@@ -265,7 +308,7 @@ function GalleryAdd() {
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
                           {(thumbnailFile && (
                             <>
-                              <a
+                              <Link
                                 target="_blank"
                                 className="cursor_pointer"
                                 href={process.env.IMAGE_BASE + thumbnailFile}
@@ -277,7 +320,7 @@ function GalleryAdd() {
                                   width={150}
                                   className="rounded-3 mb-2"
                                 />
-                              </a>
+                              </Link>
                             </>
                           )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
                           <div>
@@ -299,7 +342,7 @@ function GalleryAdd() {
                           <span className="fs_13 mt-2 slate_gray">500px width x 500px height</span>
                         </div>
                         {formErrors.thumbnailFile && (
-                          <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
+                          <p className={`text-danger fs_13 mt-1`}>{formErrors.thumbnailFile}</p>
                         )}
                       </div>
                     </Col>
@@ -308,23 +351,38 @@ function GalleryAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload Images</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          <div className="d-flex flex-wrap align-items-center gap-3 overflow-auto w-100 h-100 justify-content-center">
+                          <div className="d-flex flex-wrap align-items-center gap-3 justify-content-center">
                             {(addImageFile?.length > 0 &&
-                              addImageFile.map((preview, index) => (
+                              addImageFile.slice(0, 3).map((preview, index) => (
                                 <>
-                                  <a target="_blank" className="cursor_pointer" href={process.env.IMAGE_BASE + preview}>
-                                    <Image
-                                      key={index}
-                                      src={process.env.IMAGE_BASE + preview}
-                                      alt={`Preview ${index}`}
-                                      height={150}
-                                      width={150}
-                                      className="rounded-3 mb-2"
+                                  <div className="cursor_pointer position-relative">
+                                    <Link href={process.env.IMAGE_BASE + preview} target="_blank">
+                                      <Image
+                                        key={index}
+                                        src={process.env.IMAGE_BASE + preview}
+                                        alt={`Preview ${index}`}
+                                        height={150}
+                                        width={150}
+                                        className="rounded-3 mb-2"
+                                      />
+                                    </Link>
+
+                                    <FontAwesomeIcon
+                                      icon={faTimes}
+                                      onClick={() => handleRemoveImage(index, setAddImageFile)}
+                                      className="slate_gray cursor_pointer rounded-4 border p-1 position-absolute z-1 bg-white remove_icon"
+                                      width={25}
+                                      height={25}
                                     />
-                                  </a>
+                                  </div>
                                 </>
                               ))) || (
                               <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
+                            )}
+                            {addImageFile?.length > 3 && (
+                              <Badge className="cursor_pointer web-btn" onClick={() => setShow(true)}>
+                                ...More
+                              </Badge>
                             )}
                           </div>
                           <div>

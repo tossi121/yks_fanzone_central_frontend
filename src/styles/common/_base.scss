@@ -225,4 +225,12 @@ select {
   max-width: 204px !important;
 }
 
-
+.remove_icon {
+  right: -10px;
+  transition: all 0.4s ease-in-out;
+  top: -10px;
+  &:hover {
+    background: $purple !important;
+    color: #fff !important;
+  }
+}

@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 const routeMapping = {
+  manage_press_release: '/press-release',
   manage_gallery: '/gallery',
   manage_player_profile: '/player-profile',
-  manage_press_release: '/press-release',
   create_user: '/user-access',
 };
 

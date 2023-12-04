@@ -1,8 +1,9 @@
 import { getPlayerProfileList } from '@/_services/services_api';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
@@ -14,9 +15,12 @@ function PlayerProfile() {
   const [playerProfile, setPlayerProfile] = useState([]);
   const [loading, setLoading] = useState(false);
   const columns = [
-    { heading: 'Id', field: 'id' },
+    { heading: 'Id', field: 'serialNumber' },
+    { heading: 'Profile', field: 'profile_url' },
     { heading: 'Name', field: 'name' },
     { heading: 'Nick Name', field: 'nick_name' },
+    { heading: 'Position Name', field: 'position_name' },
+    { heading: 'Category', field: 'category' },
     { heading: 'Position', field: 'position' },
     { heading: 'DOB', field: 'date_of_birth' },
     { heading: 'Country', field: 'home_town' },
@@ -32,9 +36,19 @@ function PlayerProfile() {
 
   const options = {
     columns: {
-      render: { date_of_birth: renderDate, action: renderActions },
+      render: { date_of_birth: renderDate, action: renderActions, profile_url: renderThumbnailImage },
     },
   };
+
+  function renderThumbnailImage(value, row) {
+    return (
+      <>
+        {(row.profile_url && (
+          <Image src={process.env.IMAGE_BASE + row.profile_url} width={50} height={50} alt="thumbnailImage" />
+        )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={25} height={25} />}
+      </>
+    );
+  }
 
   const handlePlayerList = async () => {
     setLoading(true);

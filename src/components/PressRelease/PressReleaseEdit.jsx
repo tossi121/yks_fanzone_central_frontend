@@ -129,7 +129,7 @@ function PressReleaseEdit({ id }) {
       if (response?.data?.status) {
         setTimeout(() => {
           setFile(response?.data?.result[0]);
-        }, 500);
+        }, 1000);
       }
     } catch (error) {
       console.error(`Error uploading ${setFile === setThumbnailFile ? 'thumbnail' : 'pdf'} file:`, error);
@@ -279,7 +279,7 @@ function PressReleaseEdit({ id }) {
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
                           {(thumbnailFile && (
                             <>
-                              <a
+                              <Link
                                 target="_blank"
                                 className="cursor_pointer"
                                 href={process.env.IMAGE_BASE + thumbnailFile}
@@ -291,7 +291,7 @@ function PressReleaseEdit({ id }) {
                                   width={150}
                                   className="rounded-3 mb-2"
                                 />
-                              </a>
+                              </Link>
                             </>
                           )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
                           <div>
@@ -323,7 +323,7 @@ function PressReleaseEdit({ id }) {
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
                           {(pdfFile && (
                             <>
-                              <a target="_blank" className="cursor_pointer" href={process.env.IMAGE_BASE + pdfFile}>
+                              <Link target="_blank" className="cursor_pointer" href={process.env.IMAGE_BASE + pdfFile}>
                                 <Image
                                   src={'/images/pdf.png'}
                                   alt="pdfFile"
@@ -331,7 +331,7 @@ function PressReleaseEdit({ id }) {
                                   height={70}
                                   className="rounded-3"
                                 />
-                              </a>
+                              </Link>
                             </>
                           )) || (
                             <FontAwesomeIcon icon={faCloudUpload} className="slate_gray mb-3" width={35} height={35} />
