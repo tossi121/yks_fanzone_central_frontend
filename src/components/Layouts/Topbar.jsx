@@ -4,13 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { useEffect } from 'react';
 import { useState } from 'react';
 
-function Topbar(props) {
-  const { handleToggle } = props;
+function Topbar() {
   const router = useRouter();
   const [userName, setUserName] = useState(null);
 
@@ -39,12 +36,9 @@ function Topbar(props) {
               <Link href={'/'}>
                 <Image src="/images/logo.png" alt="logo" width={110} height={54} />
               </Link>
-              <div className="d-lg-none d-block">
-                <FontAwesomeIcon icon={faBars} onClick={handleToggle} width={18} height={18} />
-              </div>
-              <div className="ms-auto d-lg-flex d-none mx-2 align-items-center">
+              <div className="ms-auto d-flex align-items-center">
                 <span className="blue_dark fw-bold fs_14 text-capitalize">{userName || ''}</span>
-                <div className="mx-3">
+                <div className="mx-lg-3 mx-2">
                   <Dropdown className="slate_gray">
                     <Dropdown.Toggle
                       variant="none"

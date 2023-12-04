@@ -21,6 +21,8 @@ function PressReleaseAdd() {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const [publishDate, setPublishDate] = useState(null);
+  const [thumbnailError, setThumbnailError] = useState(null);
+  const [pdfError, setPdfError] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -106,7 +108,31 @@ function PressReleaseAdd() {
 
   const handleFileClick = (event, setFile) => {
     const file = event.target.files[0];
-    handleUpload(file, setFile);
+    handleSize(file, (error) => {
+      if (!error) {
+        handleUpload(file, setFile);
+      }
+    });
+  };
+
+  const handleSize = (file, callback) => {
+    if (file.type === 'application/pdf') {
+      if (file && file.size > 10 * 1024 * 1024) {
+        setPdfError('PDF size should be 10 MB or less');
+        callback('PDF size should be 10 MB or less');
+      } else {
+        setPdfError(null);
+        callback(null);
+      }
+    } else {
+      if (file && file.size > 10 * 1024 * 1024) {
+        setThumbnailError('Thumbnail size should be 10 MB or less');
+        callback('Thumbnail size should be 10 MB or less');
+      } else {
+        setThumbnailError(null);
+        callback(null);
+      }
+    }
   };
 
   const handleThumbnailClick = (event) => {
@@ -282,7 +308,8 @@ function PressReleaseAdd() {
                           </div>
                           <span className="fs_13 mt-2 slate_gray">800px width x 533px height</span>
                         </div>
-                        {formErrors.thumbnailFile && (
+
+                        {(thumbnailError && <p className="text-danger fs_13 mt-1">{thumbnailError}</p>) || (
                           <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
                         )}
                       </div>
@@ -325,7 +352,10 @@ function PressReleaseAdd() {
                             </label>
                           </div>
                         </div>
-                        {formErrors.pdfFile && <p className="text-danger fs_13 mt-1">{formErrors.pdfFile}</p>}
+
+                        {(pdfError && <p className="text-danger fs_13 mt-1">{pdfError}</p>) || (
+                          <p className="text-danger fs_13 mt-1">{formErrors.pdfFile}</p>
+                        )}
                       </div>
                     </Col>
 

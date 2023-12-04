@@ -18,7 +18,7 @@ function DashboardLayout(props) {
     <>
       <>
         <Toaster position="top-right" reverseOrder={false} />
-        <Topbar {...{ handleToggle }} />
+        <Topbar />
         <div className="d-flex h-100 w-100">
           <Sidebar {...{ handleToggle, toggle }} />
           <div className={`content_section ms-auto py-4 px-md-3 px-2 ${(!toggle && 'content_sm') || ''}`}>

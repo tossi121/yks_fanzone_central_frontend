@@ -47,7 +47,7 @@ function Sidebar({ toggle, handleToggle }) {
     <section className={`sidebar_section bg-white position-fixed shadow-sm ${(!toggle && 'sidebar_sm') || ''} `}>
       <div>
         <span
-          className="btn_expanded align-items-center slate_gray border rounded-circle position-absolute justify-content-center bg-white d-lg-flex d-none cursor_pointer"
+          className="btn_expanded align-items-center slate_gray border rounded-circle position-absolute justify-content-center bg-white d-flex cursor_pointer"
           onClick={handleToggle}
         >
           <FontAwesomeIcon icon={(!toggle && faChevronRight) || faChevronLeft} width={15} height={15} />
