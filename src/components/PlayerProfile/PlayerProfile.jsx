@@ -48,7 +48,12 @@ function PlayerProfile() {
 
   const options = {
     columns: {
-      render: { date_of_birth: renderDate, action: renderActions, profile_url: renderThumbnailImage },
+      render: {
+        date_of_birth: renderDate,
+        action: renderActions,
+        profile_url: renderThumbnailImage,
+        position_name: renderPosition,
+      },
     },
   };
 
@@ -74,6 +79,10 @@ function PlayerProfile() {
 
   function renderDate(value, row) {
     return <span className="text-nowrap">{moment(row.date_of_birth).format('DD MMMM YYYY')} </span>;
+  }
+
+  function renderPosition(value, row) {
+    return <span>{row.position_name?.join(', ')} </span>;
   }
 
   function renderActions(value, row) {
