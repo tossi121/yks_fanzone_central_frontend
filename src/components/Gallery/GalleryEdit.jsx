@@ -23,6 +23,8 @@ function GalleryEdit({ id }) {
   const [currentGalleryData, setCurrentGalleryData] = useState(null);
   const [publishDate, setPublishDate] = useState(null);
   const [show, setShow] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(null);
+  const [imgError, setImgError] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -112,14 +114,56 @@ function GalleryEdit({ id }) {
     }
   };
 
-  const handleAddImageClick = (event) => {
+  const handleFileClick = (event, setFiles, setErrorFunction) => {
     const files = Array.from(event.target.files);
-    handleUpload(files, setAddImageFile, addImageFile);
+    handleSize(files, setErrorFunction, (error) => {
+      if (!error) {
+        handleUpload(files, setFiles);
+      }
+    });
+  };
+
+  const handleImgClick = (event, setFiles, setErrorFunction, existingFiles = []) => {
+    const files = Array.from(event.target.files);
+    handleImgSize(files, setErrorFunction, (error) => {
+      if (!error) {
+        handleUpload(files, setFiles, existingFiles);
+      }
+    });
+  };
+
+  const handleSize = (files, setErrorFunction, callback) => {
+    const maxSize = 10 * 1024 * 1024; // 10 MB
+    const exceedsSize = files.some((file) => file.size > maxSize);
+
+    if (exceedsSize) {
+      setErrorFunction(`File size should be ${maxSize / (1024 * 1024)} MB or less`);
+      callback(`File size should be ${maxSize / (1024 * 1024)} MB or less`);
+    } else {
+      setErrorFunction(null);
+      callback(null);
+    }
+  };
+
+  const handleImgSize = (files, setErrorFunction, callback) => {
+    const maxSize = 10 * 1024 * 1024; // 10 MB
+    const exceedsSize = files.some((file) => file.size > maxSize);
+
+    if (exceedsSize) {
+      setErrorFunction(`Image size should be ${maxSize / (1024 * 1024)} MB or less`);
+      callback(`Image size should be ${maxSize / (1024 * 1024)} MB or less`);
+    } else {
+      setErrorFunction(null);
+      callback(null);
+    }
   };
 
   const handleThumbnailClick = (event) => {
-    const file = event.target.files[0];
-    handleUpload(file, setThumbnailFile);
+    handleFileClick(event, setThumbnailFile, setThumbnailError);
+  };
+
+  const handleAddImageClick = (event) => {
+    handleImgClick(event, setAddImageFile, setImgError, addImageFile);
   };
 
   const handleRemoveImage = (index, setFiles) => {
@@ -370,7 +414,7 @@ function GalleryEdit({ id }) {
                           </div>
                           <span className="fs_13 mt-2 slate_gray">500px width x 500px height</span>
                         </div>
-                        {formErrors.thumbnailFile && (
+                        {(thumbnailError && <p className="text-danger fs_13 mt-1">{thumbnailError}</p>) || (
                           <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
                         )}
                       </div>
@@ -410,7 +454,7 @@ function GalleryEdit({ id }) {
                             )}
                             {addImageFile?.length > 3 && (
                               <Badge className="cursor_pointer web-btn" onClick={() => setShow(true)}>
-                                ...More
+                                +{addImageFile?.length} More...
                               </Badge>
                             )}
                           </div>
@@ -433,7 +477,9 @@ function GalleryEdit({ id }) {
                           </div>
                           <span className="fs_13 mt-2 slate_gray">500px width x 500px height</span>
                         </div>
-                        {formErrors.addImageFile && <p className="text-danger fs_13 mt-1">{formErrors.addImageFile}</p>}
+                        {(imgError && <p className="text-danger fs_13 mt-1">{imgError}</p>) || (
+                          <p className="text-danger fs_13 mt-1">{formErrors.addImageFile}</p>
+                        )}
                       </div>
                     </Col>
                     <Col lg={12}>

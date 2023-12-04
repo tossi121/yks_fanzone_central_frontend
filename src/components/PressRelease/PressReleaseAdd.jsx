@@ -12,6 +12,9 @@ import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstra
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
+import dynamic from 'next/dynamic';
+
+const ImageLoader = dynamic(import('../DataTable/ImageLoader'));
 
 function PressReleaseAdd() {
   const [formValues, setFormValues] = useState({ title: '', edition: '', status: 'Published' });
@@ -23,6 +26,8 @@ function PressReleaseAdd() {
   const [publishDate, setPublishDate] = useState(null);
   const [thumbnailError, setThumbnailError] = useState(null);
   const [pdfError, setPdfError] = useState(null);
+  const [thumbnailLoading, setThumbnailLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -99,6 +104,8 @@ function PressReleaseAdd() {
       if (response?.data?.status) {
         setTimeout(() => {
           setFile(response?.data?.result[0]);
+          setThumbnailLoading(false);
+          setPdfLoading(false);
         }, 1000);
       }
     } catch (error) {
@@ -121,6 +128,7 @@ function PressReleaseAdd() {
         setPdfError('PDF size should be 10 MB or less');
         callback('PDF size should be 10 MB or less');
       } else {
+        setPdfLoading(true);
         setPdfError(null);
         callback(null);
       }
@@ -129,6 +137,7 @@ function PressReleaseAdd() {
         setThumbnailError('Thumbnail size should be 10 MB or less');
         callback('Thumbnail size should be 10 MB or less');
       } else {
+        setThumbnailLoading(true);
         setThumbnailError(null);
         callback(null);
       }
@@ -273,40 +282,46 @@ function PressReleaseAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailFile && (
+                          {(thumbnailLoading && <ImageLoader />) || (
                             <>
-                              <Link
-                                target="_blank"
-                                className="cursor_pointer"
-                                href={process.env.IMAGE_BASE + thumbnailFile}
-                              >
-                                <Image
-                                  src={process.env.IMAGE_BASE + thumbnailFile}
-                                  alt="thumbnail"
-                                  height={150}
-                                  width={150}
-                                  className="rounded-3 mb-2"
+                              {(thumbnailFile && (
+                                <>
+                                  <Link
+                                    target="_blank"
+                                    className="cursor_pointer"
+                                    href={process.env.IMAGE_BASE + thumbnailFile}
+                                  >
+                                    <Image
+                                      src={process.env.IMAGE_BASE + thumbnailFile}
+                                      alt="thumbnail"
+                                      height={150}
+                                      width={150}
+                                      className="rounded-3 mb-2"
+                                    />
+                                  </Link>
+                                </>
+                              )) || (
+                                <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
+                              )}
+                              <div>
+                                <Form.Control
+                                  type="file"
+                                  id="thumbnail"
+                                  onChange={handleThumbnailClick}
+                                  accept="image/png, image/jpeg, image/jpg, image/svg+xml"
+                                  className="d-none"
+                                  aria-describedby="thumbnail"
                                 />
-                              </Link>
+                                <label
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  htmlFor="thumbnail"
+                                >
+                                  <span className="d-inline-flex align-middle">Upload Thumbnail</span>
+                                </label>
+                              </div>
+                              <span className="fs_13 mt-2 slate_gray">800px width x 533px height</span>
                             </>
-                          )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
-                          <div>
-                            <Form.Control
-                              type="file"
-                              id="thumbnail"
-                              onChange={handleThumbnailClick}
-                              accept="image/png, image/jpeg, image/jpg, image/svg+xml"
-                              className="d-none"
-                              aria-describedby="thumbnail"
-                            />
-                            <label
-                              className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
-                              htmlFor="thumbnail"
-                            >
-                              <span className="d-inline-flex align-middle">Upload Thumbnail</span>
-                            </label>
-                          </div>
-                          <span className="fs_13 mt-2 slate_gray">800px width x 533px height</span>
+                          )}
                         </div>
 
                         {(thumbnailError && <p className="text-danger fs_13 mt-1">{thumbnailError}</p>) || (
@@ -318,41 +333,54 @@ function PressReleaseAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload PDF File</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(pdfFile && (
+                          {(pdfLoading && <ImageLoader />) || (
                             <>
-                              <Link target="_blank" className="cursor_pointer" href={process.env.IMAGE_BASE + pdfFile}>
-                                <Image
-                                  src={'/images/pdf.png'}
-                                  alt="pdfFile"
-                                  width={70}
-                                  height={70}
-                                  className="rounded-3"
+                              {(pdfFile && (
+                                <>
+                                  <Link
+                                    target="_blank"
+                                    className="cursor_pointer"
+                                    href={process.env.IMAGE_BASE + pdfFile}
+                                  >
+                                    <Image
+                                      src={'/images/pdf.png'}
+                                      alt="pdfFile"
+                                      width={70}
+                                      height={70}
+                                      className="rounded-3"
+                                    />
+                                  </Link>
+                                </>
+                              )) || (
+                                <FontAwesomeIcon
+                                  icon={faCloudUpload}
+                                  className="slate_gray mb-3"
+                                  width={35}
+                                  height={35}
                                 />
-                              </Link>
+                              )}
+
+                              <div>
+                                <Form.Control
+                                  type="file"
+                                  id="pdfFile"
+                                  onChange={handlePdfClick}
+                                  accept=".pdf"
+                                  className="d-none"
+                                  aria-describedby="pdfFile"
+                                />
+
+                                <label
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  htmlFor="pdfFile"
+                                >
+                                  <span className="d-inline-flex align-middle">Upload PDF File</span>
+                                </label>
+                              </div>
+                              <span className="fs_13 mt-2 slate_gray">800px width x 533px height</span>
                             </>
-                          )) || (
-                            <FontAwesomeIcon icon={faCloudUpload} className="slate_gray mb-3" width={35} height={35} />
                           )}
-
-                          <div>
-                            <Form.Control
-                              type="file"
-                              id="pdfFile"
-                              onChange={handlePdfClick}
-                              accept=".pdf"
-                              className="d-none"
-                              aria-describedby="pdfFile"
-                            />
-
-                            <label
-                              className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
-                              htmlFor="pdfFile"
-                            >
-                              <span className="d-inline-flex align-middle">Upload PDF File</span>
-                            </label>
-                          </div>
                         </div>
-
                         {(pdfError && <p className="text-danger fs_13 mt-1">{pdfError}</p>) || (
                           <p className="text-danger fs_13 mt-1">{formErrors.pdfFile}</p>
                         )}

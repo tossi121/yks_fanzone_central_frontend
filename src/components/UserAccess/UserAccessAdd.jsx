@@ -20,8 +20,8 @@ function UserAccessAdd() {
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [userPermissions, setUserPermissions] = useState([]);
-  const router = useRouter();
   const [passwordShown, setPasswordShown] = useState(false);
+  const router = useRouter();
 
   const togglePassword = () => {
     setPasswordShown(!passwordShown);

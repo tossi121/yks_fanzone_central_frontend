@@ -30,10 +30,11 @@ function PlayerProfileEdit({ id }) {
   const [formErrors, setFormErrors] = useState({});
   const [dob, setDob] = useState(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const [selectedItems, setSelectedItems] = useState([]);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [position, setPosition] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (playerProfileId) {
@@ -161,7 +162,21 @@ function PlayerProfileEdit({ id }) {
 
   const handleFileClick = (event, setFile) => {
     const file = event.target.files[0];
-    handleUpload(file, setFile);
+    handleSize(file, (error) => {
+      if (!error) {
+        handleUpload(file, setFile);
+      }
+    });
+  };
+
+  const handleSize = (file, callback) => {
+    if (file && file.size > 10 * 1024 * 1024) {
+      setThumbnailError('Profile picture size should be 10 MB or less');
+      callback('Profile picture size should be 10 MB or less');
+    } else {
+      setThumbnailError(null);
+      callback(null);
+    }
   };
 
   const handleThumbnailClick = (event) => {
@@ -308,7 +323,7 @@ function PlayerProfileEdit({ id }) {
                             </label>
                           </div>
                         </div>
-                        {formErrors.thumbnailFile && (
+                        {(thumbnailError && <p className="text-danger fs_13 mt-1">{thumbnailError}</p>) || (
                           <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
                         )}
                       </div>
