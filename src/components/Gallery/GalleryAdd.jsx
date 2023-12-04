@@ -13,6 +13,10 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment';
 
+import dynamic from 'next/dynamic';
+
+const ImageLoader = dynamic(import('../DataTable/ImageLoader'));
+
 function GalleryAdd() {
   const [formValues, setFormValues] = useState({ title: '', description: '', status: 'Published' });
   const [formErrors, setFormErrors] = useState({});
@@ -23,6 +27,8 @@ function GalleryAdd() {
   const [show, setShow] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(null);
   const [imgError, setImgError] = useState(null);
+  const [thumbnailLoading, setThumbnailLoading] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -72,6 +78,8 @@ function GalleryAdd() {
       if (response?.data?.status) {
         setTimeout(() => {
           setFiles(existingFiles.concat(response?.data?.result));
+          setThumbnailLoading(false);
+          setImgLoading(false);
         }, 1000);
       }
     } catch (error) {
@@ -98,20 +106,21 @@ function GalleryAdd() {
   };
 
   const handleSize = (files, setErrorFunction, callback) => {
-    const maxSize = 10 * 1024 * 1024; // 10 MB
+    const maxSize = 10 * 1024 * 1024;
     const exceedsSize = files.some((file) => file.size > maxSize);
 
     if (exceedsSize) {
-      setErrorFunction(`File size should be ${maxSize / (1024 * 1024)} MB or less`);
-      callback(`File size should be ${maxSize / (1024 * 1024)} MB or less`);
+      setErrorFunction(`Thumbnail size should be ${maxSize / (1024 * 1024)} MB or less`);
+      callback(`Thumbnail size should be ${maxSize / (1024 * 1024)} MB or less`);
     } else {
       setErrorFunction(null);
       callback(null);
+      setThumbnailLoading(true);
     }
   };
 
   const handleImgSize = (files, setErrorFunction, callback) => {
-    const maxSize = 10 * 1024 * 1024; // 10 MB
+    const maxSize = 10 * 1024 * 1024;
     const exceedsSize = files.some((file) => file.size > maxSize);
 
     if (exceedsSize) {
@@ -120,6 +129,7 @@ function GalleryAdd() {
     } else {
       setErrorFunction(null);
       callback(null);
+      setImgLoading(true);
     }
   };
 
@@ -203,7 +213,9 @@ function GalleryAdd() {
     return (
       <>
         <Modal show={show} centered size="lg" onHide={() => setShow(false)}>
-          <Modal.Header closeButton className='fw-semibold'>All Uploaded Images</Modal.Header>
+          <Modal.Header closeButton className="fw-semibold">
+            All Uploaded Images
+          </Modal.Header>
           <Modal.Body>
             <div className="d-flex flex-wrap align-items-center gap-3 justify-content-center">
               {(addImageFile?.length > 0 &&
@@ -236,7 +248,7 @@ function GalleryAdd() {
       </>
     );
   }
-  
+
   return (
     <>
       {show && <ModalGallery />}
@@ -349,105 +361,114 @@ function GalleryAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailFile && (
+                          {(thumbnailLoading && <ImageLoader />) || (
                             <>
-                              <Link
-                                target="_blank"
-                                className="cursor_pointer"
-                                href={process.env.IMAGE_BASE + thumbnailFile}
-                              >
-                                <Image
-                                  src={process.env.IMAGE_BASE + thumbnailFile}
-                                  alt="thumbnail"
-                                  height={150}
-                                  width={150}
-                                  className="rounded-3 mb-2"
+                              {(thumbnailFile && (
+                                <>
+                                  <Link
+                                    target="_blank"
+                                    className="cursor_pointer"
+                                    href={process.env.IMAGE_BASE + thumbnailFile}
+                                  >
+                                    <Image
+                                      src={process.env.IMAGE_BASE + thumbnailFile}
+                                      alt="thumbnail"
+                                      height={150}
+                                      width={150}
+                                      className="rounded-3 mb-2"
+                                    />
+                                  </Link>
+                                </>
+                              )) || (
+                                <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
+                              )}
+                              <div>
+                                <Form.Control
+                                  type="file"
+                                  id="thumbnail"
+                                  onChange={handleThumbnailClick}
+                                  accept="image/png, image/jpeg, image/jpg, image/svg+xml"
+                                  className="d-none"
+                                  aria-describedby="thumbnail"
                                 />
-                              </Link>
+                                <label
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  htmlFor="thumbnail"
+                                >
+                                  <span className="d-inline-flex align-middle">Upload Thumbnail</span>
+                                </label>
+                              </div>
+                              <span className="fs_13 mt-2 slate_gray">500px width x 500px height</span>
                             </>
-                          )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
-                          <div>
-                            <Form.Control
-                              type="file"
-                              id="thumbnail"
-                              onChange={handleThumbnailClick}
-                              accept="image/png, image/jpeg, image/jpg, image/svg+xml"
-                              className="d-none"
-                              aria-describedby="thumbnail"
-                            />
-                            <label
-                              className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
-                              htmlFor="thumbnail"
-                            >
-                              <span className="d-inline-flex align-middle">Upload Thumbnail</span>
-                            </label>
-                          </div>
-                          <span className="fs_13 mt-2 slate_gray">500px width x 500px height</span>
+                          )}
                         </div>
+
                         {(thumbnailError && <p className="text-danger fs_13 mt-1">{thumbnailError}</p>) || (
                           <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
                         )}
                       </div>
                     </Col>
-
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Upload Images</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          <div className="d-flex flex-wrap align-items-center gap-3 justify-content-center">
-                            {(addImageFile?.length > 0 &&
-                              addImageFile.slice(0, 3).map((preview, index) => (
-                                <>
-                                  <div className="cursor_pointer position-relative">
-                                    <Link href={process.env.IMAGE_BASE + preview} target="_blank">
-                                      <Image
-                                        key={index}
-                                        src={process.env.IMAGE_BASE + preview}
-                                        alt={`Preview ${index}`}
-                                        height={150}
-                                        width={150}
-                                        className="rounded-3 mb-2"
-                                      />
-                                    </Link>
+                          {(imgLoading && <ImageLoader />) || (
+                            <>
+                              <div className="d-flex flex-wrap align-items-center gap-3 justify-content-center">
+                                {(addImageFile?.length > 0 &&
+                                  addImageFile.slice(0, 3).map((preview, index) => (
+                                    <>
+                                      <div className="cursor_pointer position-relative">
+                                        <Link href={process.env.IMAGE_BASE + preview} target="_blank">
+                                          <Image
+                                            key={index}
+                                            src={process.env.IMAGE_BASE + preview}
+                                            alt={`Preview ${index}`}
+                                            height={150}
+                                            width={150}
+                                            className="rounded-3 mb-2"
+                                          />
+                                        </Link>
 
-                                    <FontAwesomeIcon
-                                      icon={faTimes}
-                                      onClick={() => handleRemoveImage(index, setAddImageFile)}
-                                      className="slate_gray cursor_pointer rounded-4 border p-1 position-absolute z-1 bg-white remove_icon"
-                                      width={25}
-                                      height={25}
-                                    />
-                                  </div>
-                                </>
-                              ))) || (
-                              <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
-                            )}
-                            {addImageFile?.length > 3 && (
-                              <Badge className="cursor_pointer web-btn" onClick={() => setShow(true)}>
-                                +{addImageFile?.length} More...
-                              </Badge>
-                            )}
-                          </div>
-                          <div>
-                            <Form.Control
-                              multiple
-                              type="file"
-                              id="addImages"
-                              onChange={handleAddImageClick}
-                              accept="image/png, image/jpeg, image/jpg, image/svg+xml"
-                              className="d-none"
-                              aria-describedby="addImages"
-                            />
-                            <label
-                              className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
-                              htmlFor="addImages"
-                            >
-                              <span className="d-inline-flex align-middle">Upload Images</span>
-                            </label>
-                          </div>
-                          <span className="fs_13 mt-2 slate_gray">500px width x 500px height</span>
+                                        <FontAwesomeIcon
+                                          icon={faTimes}
+                                          onClick={() => handleRemoveImage(index, setAddImageFile)}
+                                          className="slate_gray cursor_pointer rounded-4 border p-1 position-absolute z-1 bg-white remove_icon"
+                                          width={25}
+                                          height={25}
+                                        />
+                                      </div>
+                                    </>
+                                  ))) || (
+                                  <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
+                                )}
+                                {addImageFile?.length > 3 && (
+                                  <Badge className="cursor_pointer web-btn" onClick={() => setShow(true)}>
+                                    +{addImageFile?.length} More...
+                                  </Badge>
+                                )}
+                              </div>
+                              <div>
+                                <Form.Control
+                                  multiple
+                                  type="file"
+                                  id="addImages"
+                                  onChange={handleAddImageClick}
+                                  accept="image/png, image/jpeg, image/jpg, image/svg+xml"
+                                  className="d-none"
+                                  aria-describedby="addImages"
+                                />
+                                <label
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  htmlFor="addImages"
+                                >
+                                  <span className="d-inline-flex align-middle">Upload Images</span>
+                                </label>
+                              </div>
+                              <span className="fs_13 mt-2 slate_gray">500px width x 500px height</span>
+                            </>
+                          )}
                         </div>
-
                         {(imgError && <p className="text-danger fs_13 mt-1">{imgError}</p>) || (
                           <p className="text-danger fs_13 mt-1">{formErrors.addImageFile}</p>
                         )}

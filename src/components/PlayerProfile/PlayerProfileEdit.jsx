@@ -13,6 +13,10 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
 
+import dynamic from 'next/dynamic';
+
+const ImageLoader = dynamic(import('../DataTable/ImageLoader'));
+
 function PlayerProfileEdit({ id }) {
   const playerProfileId = id;
   const [formValues, setFormValues] = useState({
@@ -32,8 +36,8 @@ function PlayerProfileEdit({ id }) {
   const [loading, setLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [position, setPosition] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(null);
+  const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -153,6 +157,7 @@ function PlayerProfileEdit({ id }) {
       if (response?.data?.status) {
         setTimeout(() => {
           setFile(response?.data?.result[0]);
+          setThumbnailLoading(false);
         }, 1000);
       }
     } catch (error) {
@@ -176,6 +181,7 @@ function PlayerProfileEdit({ id }) {
     } else {
       setThumbnailError(null);
       callback(null);
+      setThumbnailLoading(true);
     }
   };
 
@@ -205,7 +211,7 @@ function PlayerProfileEdit({ id }) {
       errors.bio = 'Please enter a bio';
     }
     if (!thumbnailFile) {
-      errors.thumbnailFile = 'Please upload a thumbnail';
+      errors.thumbnailFile = 'Please profile picture';
     } else if (thumbnailFile.size > 10 * 1024 * 1024) {
       errors.thumbnailFile = 'File size should be 10 MB or less';
     }
@@ -255,10 +261,8 @@ function PlayerProfileEdit({ id }) {
       const isSelected = Array.isArray(prevSelected) && prevSelected.includes(option);
 
       if (isSelected) {
-        setPosition(false);
         return prevSelected.filter((item) => item !== option);
       } else {
-        setPosition(true);
         return [...(Array.isArray(prevSelected) ? prevSelected : []), option];
       }
     });
@@ -289,39 +293,45 @@ function PlayerProfileEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Player Profile</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailFile && (
+                          {(thumbnailLoading && <ImageLoader />) || (
                             <>
-                              <Link
-                                target="_blank"
-                                className="cursor_pointer"
-                                href={process.env.IMAGE_BASE + thumbnailFile}
-                              >
-                                <Image
-                                  src={process.env.IMAGE_BASE + thumbnailFile}
-                                  alt="thumbnail"
-                                  height={150}
-                                  width={150}
-                                  className="rounded-3 mb-2"
+                              {(thumbnailFile && (
+                                <>
+                                  <Link
+                                    target="_blank"
+                                    className="cursor_pointer"
+                                    href={process.env.IMAGE_BASE + thumbnailFile}
+                                  >
+                                    <Image
+                                      src={process.env.IMAGE_BASE + thumbnailFile}
+                                      alt="thumbnail"
+                                      height={150}
+                                      width={150}
+                                      className="rounded-3 mb-2"
+                                    />
+                                  </Link>
+                                </>
+                              )) || (
+                                <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />
+                              )}
+                              <div>
+                                <Form.Control
+                                  type="file"
+                                  id="thumbnail"
+                                  onChange={handleThumbnailClick}
+                                  accept="image/png, image/jpeg, image/jpg, image/svg+xml"
+                                  className="d-none"
+                                  aria-describedby="thumbnail"
                                 />
-                              </Link>
+                                <label
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  htmlFor="thumbnail"
+                                >
+                                  <span className="d-inline-flex align-middle">Player Profile </span>
+                                </label>
+                              </div>
                             </>
-                          )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={35} height={35} />}
-                          <div>
-                            <Form.Control
-                              type="file"
-                              id="thumbnail"
-                              onChange={handleThumbnailClick}
-                              accept="image/png, image/jpeg, image/jpg, image/svg+xml"
-                              className="d-none"
-                              aria-describedby="thumbnail"
-                            />
-                            <label
-                              className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
-                              htmlFor="thumbnail"
-                            >
-                              <span className="d-inline-flex align-middle">Player Profile </span>
-                            </label>
-                          </div>
+                          )}
                         </div>
                         {(thumbnailError && <p className="text-danger fs_13 mt-1">{thumbnailError}</p>) || (
                           <p className="text-danger fs_13 mt-1">{formErrors.thumbnailFile}</p>
@@ -393,7 +403,9 @@ function PlayerProfileEdit({ id }) {
                               id="dropdown-basic"
                               disabled={selectedOptions == null || selectedOptions.length == 0}
                             >
-                              {(!position && 'Select Position') || selectedItems}
+                              {selectedItems == null || selectedItems.length === 0
+                                ? 'Select Position'
+                                : selectedItems.join(', ')}
                             </Dropdown.Toggle>
                             <Dropdown.Menu className="w-100">
                               {selectedOptions.map((option, index) => (
