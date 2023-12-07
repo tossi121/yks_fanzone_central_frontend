@@ -14,8 +14,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 
-const ImageLoader = dynamic(import('../DataTable/ImageLoader'));
-
 function PressReleaseEdit({ id }) {
   const pressReleaseId = id;
 
@@ -314,7 +312,9 @@ function PressReleaseEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailLoading && <ImageLoader />) || (
+                          {(thumbnailLoading && (
+                            <Spinner animation="border" size="lg" variant="primary" className="spinner" />
+                          )) || (
                             <>
                               {(thumbnailFile && (
                                 <>
@@ -364,7 +364,9 @@ function PressReleaseEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Upload PDF File</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(pdfLoading && <ImageLoader />) || (
+                          {(pdfLoading && (
+                            <Spinner animation="border" size="lg" variant="primary" className="spinner" />
+                          )) || (
                             <>
                               {(pdfFile && (
                                 <>

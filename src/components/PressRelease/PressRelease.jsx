@@ -57,7 +57,6 @@ function PressRelease() {
     };
     return (
       <>
-        {console.log(currentPage, 'currentPage')}
         <div className="action_btn text-nowrap">
           <Link href={`press-release/${row.id}?page=${currentPage}`}>
             <FontAwesomeIcon
@@ -111,7 +110,7 @@ function PressRelease() {
   const handlePressReleasesList = async (e) => {
     setLoading(true);
     const res = await getPressReleasesList();
-    if (res.status) {
+    if (res?.status) {
       const data = res.data;
       setPressReleases(data);
     }

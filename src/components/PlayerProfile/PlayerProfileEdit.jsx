@@ -15,8 +15,6 @@ import toast from 'react-hot-toast';
 
 import dynamic from 'next/dynamic';
 
-const ImageLoader = dynamic(import('../DataTable/ImageLoader'));
-
 function PlayerProfileEdit({ id }) {
   const playerProfileId = id;
   const [formValues, setFormValues] = useState({
@@ -82,7 +80,6 @@ function PlayerProfileEdit({ id }) {
       } else {
         console.error('yearsActive is undefined');
       }
-
       const dobDate = new Date(currentPlayer?.date_of_birth);
       if (!isNaN(dobDate.getTime())) {
         setDob(dobDate);
@@ -291,7 +288,9 @@ function PlayerProfileEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Player Profile</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailLoading && <ImageLoader />) || (
+                          {(thumbnailLoading && (
+                            <Spinner animation="border" size="lg" variant="primary" className="spinner" />
+                          )) || (
                             <>
                               {(thumbnailFile && (
                                 <>
@@ -381,11 +380,14 @@ function PlayerProfileEdit({ id }) {
                             onChange={handleChange}
                             className="shadow-none fs_14 slate_gray form-control cursor_pointer"
                           >
-                            <option>Select Position Category</option>
-                            <option value={'Raider'}>Raider</option>
-                            <option value={'Defender'}>Defender</option>
-                            <option value={'All_Rounder'}>All Rounder</option>
+                            <option value="" disabled>
+                              Select Position Category
+                            </option>
+                            <option value="Raider">Raider</option>
+                            <option value="Defender">Defender</option>
+                            <option value="All_Rounder">All Rounder</option>
                           </Form.Select>
+
                           {formErrors.category && <p className="text-danger fs_13 mt-1">{formErrors.category}</p>}
                         </Form.Group>
                       </div>
@@ -399,12 +401,13 @@ function PlayerProfileEdit({ id }) {
                               variant=""
                               className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
                               id="dropdown-basic"
-                              disabled={selectedOptions == null || selectedOptions.length == 0}
+                              disabled={selectedOptions == null || selectedOptions.length === 0}
                             >
                               {selectedItems == null || selectedItems.length === 0
                                 ? 'Select Position'
                                 : selectedItems.join(', ')}
                             </Dropdown.Toggle>
+
                             <Dropdown.Menu className="w-100">
                               {selectedOptions.map((option, index) => (
                                 <div key={index} className="d-flex align-items-center dropdown-item w-100">

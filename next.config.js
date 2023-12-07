@@ -9,8 +9,8 @@ const nextConfig = {
     unoptimized: true,
   },
   env: {
-    BASE_API_URL: 'http://192.168.1.23:7012/',
-    IMAGE_BASE: 'https://d1zoo736173x95.cloudfront.net/',
+    BASE_API_URL: 'http://localhost:7012/',
+    IMAGE_BASE: 'https://test',
     LOGIN_DATA: 'login',
 
     // Press Releases

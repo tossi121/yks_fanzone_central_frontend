@@ -21,7 +21,6 @@ const CustomPagination = (props) => {
     setCurrentPage(page);
   }
 
-  // console.log(currentPage, "currentPage")
 
   // useEffect(() => {
   //   setCurrentPage(currentPage);

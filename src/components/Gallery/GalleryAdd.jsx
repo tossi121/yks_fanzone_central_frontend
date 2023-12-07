@@ -15,7 +15,7 @@ import moment from 'moment';
 
 import dynamic from 'next/dynamic';
 
-const ImageLoader = dynamic(import('../DataTable/ImageLoader'));
+
 
 function GalleryAdd() {
   const [formValues, setFormValues] = useState({ title: '', description: '', status: 'Published' });
@@ -361,7 +361,7 @@ function GalleryAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailLoading && <ImageLoader />) || (
+                          {(thumbnailLoading &&  <Spinner animation="border" size="lg" variant="primary" className="spinner" />) || (
                             <>
                               {(thumbnailFile && (
                                 <>
@@ -412,7 +412,7 @@ function GalleryAdd() {
                       <Form.Label className="blue_dark fw-medium">Upload Images</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(imgLoading && <ImageLoader />) || (
+                          {(imgLoading &&  <Spinner animation="border" size="lg" variant="primary" className="spinner" />) || (
                             <>
                               <div className="d-flex flex-wrap align-items-center gap-3 justify-content-center">
                                 {(addImageFile?.length > 0 &&
