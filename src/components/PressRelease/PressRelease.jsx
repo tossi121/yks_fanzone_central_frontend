@@ -123,6 +123,7 @@ function PressRelease() {
     };
     setLoading(true);
     const res = await deletePressRelease(params);
+    setCurrentPage(1);
     if (res?.status) {
       toast.success(res?.message);
       setShowModal(false);

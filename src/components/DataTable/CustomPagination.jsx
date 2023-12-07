@@ -49,7 +49,7 @@ const CustomPagination = (props) => {
       const lastPageIndex = totalCount;
       return lastPageIndex;
     }
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, currentTableData]);
 
   const numberOfFirstData = useMemo(() => {
     const firstPageIndex = (Number(currentPage) - 2) * Number(pageSize) + 1;

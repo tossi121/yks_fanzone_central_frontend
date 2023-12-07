@@ -105,6 +105,7 @@ function UserAccess() {
   const handleDelete = async (e) => {
     setLoading(true);
     const res = await deleteUserAccessPermission(deleteId.id);
+    setCurrentPage(1);
     if (res?.status) {
       toast.success(res?.message);
       setShowModal(false);

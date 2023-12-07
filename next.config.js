@@ -10,7 +10,7 @@ const nextConfig = {
   },
   env: {
     BASE_API_URL: 'http://localhost:7012/',
-    IMAGE_BASE: 'https://test',
+    IMAGE_BASE: '',
     LOGIN_DATA: 'login',
 
     // Press Releases

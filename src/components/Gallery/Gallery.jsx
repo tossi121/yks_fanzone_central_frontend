@@ -136,6 +136,7 @@ function Gallery() {
       id: deleteId.id,
     };
     setLoading(true);
+    setCurrentPage(1);
     const res = await deleteGallery(params);
     if (res?.status) {
       toast.success(res?.message);
