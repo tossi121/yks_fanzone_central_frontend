@@ -125,6 +125,7 @@ function PlayerProfileEdit({ id }) {
     const { name, value } = e.target;
     setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
     setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+    setSelectedItems([]);
   };
 
   const createFormData = (file, folderName) => {

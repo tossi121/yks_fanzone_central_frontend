@@ -9,7 +9,7 @@ const nextConfig = {
     unoptimized: true,
   },
   env: {
-    BASE_API_URL: 'http://localhost:7012/',
+    BASE_API_URL: 'http://192.168.1.15:7012/',
     IMAGE_BASE: '',
     LOGIN_DATA: 'login',
 
