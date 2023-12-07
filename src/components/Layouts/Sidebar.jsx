@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,9 +20,24 @@ const links = [
 ];
 
 function SidebarLink({ href, label, iconSrc, tokenKey }) {
+  const [token, setToken] = useState('');
+  const [tokenValues, setTokenValues] = useState(null);
   const router = useRouter();
-  const token = Cookies.get('yks_fanzone_central_permissions');
-  const tokenValues = token?.split(',');
+
+  useEffect(() => {
+    const yksToken = Cookies.get('yks_fanzone_central_permissions');
+    if (yksToken) {
+      setToken(yksToken);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      const values = token?.split(',');
+      setTokenValues(values);
+    }
+  }, [token]);
+
   const hasPermission = (key) => tokenValues?.some((value) => value.includes(key));
   const isActive = router.asPath === href || (href !== '/' && router.asPath.startsWith(href)) ? 'active' : '';
 
@@ -37,7 +52,7 @@ function SidebarLink({ href, label, iconSrc, tokenKey }) {
             </div>
           </Link>
         </li>
-       )}
+      )}
     </>
   );
 }
