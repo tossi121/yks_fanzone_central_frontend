@@ -203,3 +203,69 @@ export async function updateUserAccessPermissions(params) {
     return null;
   }
 }
+
+export async function getTeamList(params) {
+  try {
+    const response = await fetcher('GET', process.env.TEAM_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function getMatchList(params) {
+  try {
+    const response = await fetcher('GET', process.env.MATCH_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+// photoTaggings
+export async function getPhotoTaggingsList(params) {
+  try {
+    const response = await fetcher('GET', process.env.PHOTO_TAGGINGS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function currentPhotoTagging(id) {
+  try {
+    const url = `${process.env.PHOTO_TAGGINGS_DATA}/${id}`;
+    const response = await fetcher('GET', url);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function addPhotoTaggings(params) {
+  try {
+    const response = await fetcher('POST', process.env.PHOTO_TAGGINGS_ADD_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function deletePhotoTaggings(params) {
+  try {
+    const response = await fetcher('POST', process.env.PHOTO_TAGGINGS_DELETE_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function updatePhotoTagging(id, params) {
+  try {
+    const url = `${process.env.PHOTO_TAGGINGS_UPDATE_DATA}/${id}`;
+    const response = await fetcher('POST', url, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}

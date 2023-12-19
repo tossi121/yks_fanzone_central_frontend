@@ -7,8 +7,10 @@ import {
   faChevronRight,
   faImages,
   faNewspaper,
+  faPhotoFilm,
   faUser,
   faUserFriends,
+  faVideo,
 } from '@fortawesome/free-solid-svg-icons';
 import Cookies from 'js-cookie';
 
@@ -17,6 +19,8 @@ const links = [
   { href: '/gallery', tokenKey: 'manage_gallery', label: 'Gallery', iconSrc: faImages },
   { href: '/player-profile', tokenKey: 'manage_player_profile', label: 'Player Profile', iconSrc: faUserFriends },
   { href: '/user-access', tokenKey: 'create_user', label: 'User Access', iconSrc: faUser },
+  { href: '/photo-tagging', tokenKey: 'create_user', label: 'Photo Tagging', iconSrc: faPhotoFilm },
+  { href: '/video-tagging', tokenKey: 'create_user', label: 'Video Tagging', iconSrc: faVideo },
 ];
 
 function SidebarLink({ href, label, iconSrc, tokenKey }) {

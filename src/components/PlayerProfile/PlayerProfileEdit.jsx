@@ -322,7 +322,7 @@ function PlayerProfileEdit({ id }) {
                                   aria-describedby="thumbnail"
                                 />
                                 <label
-                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs_14 me-2 cursor_pointer"
                                   htmlFor="thumbnail"
                                 >
                                   <span className="d-inline-flex align-middle">Player Profile </span>
@@ -411,7 +411,7 @@ function PlayerProfileEdit({ id }) {
 
                             <Dropdown.Menu className="w-100">
                               {selectedOptions.map((option, index) => (
-                                <div key={index} className="d-flex align-items-center dropdown-item w-100">
+                                <div key={index} className="d-flex align-items-center dropdown-item w-100 slate_gray">
                                   <input
                                     type="checkbox"
                                     id={index}

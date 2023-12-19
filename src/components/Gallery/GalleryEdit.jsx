@@ -422,7 +422,7 @@ function GalleryEdit({ id }) {
                                   aria-describedby="thumbnail"
                                 />
                                 <label
-                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs_14 me-2 cursor_pointer"
                                   htmlFor="thumbnail"
                                 >
                                   <span className="d-inline-flex align-middle">Upload Thumbnail</span>
@@ -490,7 +490,7 @@ function GalleryEdit({ id }) {
                                   aria-describedby="addImages"
                                 />
                                 <label
-                                  className="common_btn text-white rounded-2 py-2 px-3 fs-14 me-2 cursor_pointer"
+                                  className="common_btn text-white rounded-2 py-2 px-3 fs_14 me-2 cursor_pointer"
                                   htmlFor="addImages"
                                 >
                                   <span className="d-inline-flex align-middle">Upload Images</span>

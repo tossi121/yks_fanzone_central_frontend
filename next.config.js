@@ -9,8 +9,8 @@ const nextConfig = {
     unoptimized: true,
   },
   env: {
-    BASE_API_URL: 'http://192.168.1.15:7012/',
-    IMAGE_BASE: '',
+    BASE_API_URL: 'http://192.168.1.46:7012/',
+    IMAGE_BASE: 'http://ec2-13-201-102-143.ap-south-1.compute.amazonaws.com/',
     LOGIN_DATA: 'login',
 
     // Press Releases
@@ -35,6 +35,16 @@ const nextConfig = {
     USER_ACCESS_DELETE_PERMISSIONS_DATA: 'admin/deleteuser',
     USER_ACCESS_CURRENT_PERMISSIONS_DATA: 'admin/getusers',
     USER_ACCESS_UPDATE_PERMISSIONS_DATA: 'admin/updateuser',
+
+    // allteams
+    TEAM_DATA: 'admin/allteams',
+    // matches
+    MATCH_DATA: 'admin/matches',
+    // photoTaggings
+    PHOTO_TAGGINGS_DATA: 'admin/photoTaggings',
+    PHOTO_TAGGINGS_ADD_DATA: 'admin/photoTagging',
+    PHOTO_TAGGINGS_DELETE_DATA: 'admin/photoTaggingDelete',
+    PHOTO_TAGGINGS_UPDATE_DATA: 'admin/photoTaggingUpdate',
   },
 };
 
