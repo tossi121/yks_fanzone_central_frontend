@@ -1,76 +1,79 @@
-import React, { useEffect, useState } from 'react';
-import { deletePhotoTaggings, getPhotoTaggingsList } from '@/_services/services_api';
-import { Badge, Card, Col, Container, Row } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import dynamic from 'next/dynamic';
+import { deleteArticles, getArticlesList } from '@/_services/services_api';
 import { faEdit, faImage, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
-import Link from 'next/link';
-import toast from 'react-hot-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import moment from 'moment';
+import parse from 'html-react-parser';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { Badge, Card, Col, Container, Modal, Row } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 
 const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 const DeleteModal = dynamic(import('../DeleteModal'));
 const TableLoader = dynamic(import('../DataTable/TableLoader'));
 
-function PhotoTagging() {
-  const [photoTaggingData, setPhotoTaggingData] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
+function Articles() {
+  const [articlesData, setArticlesData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [deleteId, setDeleteId] = useState(null);
+  const [show, setShow] = useState(false);
   const router = useRouter();
   const { page } = router.query;
 
   useEffect(() => {
     if (page) {
       setCurrentPage(Number(page));
-      router.replace('/photo-tagging');
+      router.replace('/articles');
     }
   }, [page]);
 
   const columns = [
     { heading: 'Id', field: 'serialNumber' },
-    { heading: 'Photo', field: 'imageUrl' },
-    { heading: 'Edition Tags', field: 'edition' },
-    { heading: 'Players Tags', field: 'players' },
-    { heading: 'Teams tags', field: 'teams' },
-    { heading: 'Matches', field: 'matches' },
-    { heading: 'Other Tags', field: 'customTags' },
+    { heading: 'Image', field: 'imageUrl' },
+    { heading: 'Title', field: 'title' },
+    { heading: 'Articles Type', field: 'articles_type' },
+    { heading: 'Tags', field: 'tags' },
+    { heading: 'Content', field: 'content' },
+    { heading: 'Schedule', field: 'schedule' },
     { heading: 'Status', field: 'status' },
     { heading: 'Action', field: 'action', align: 'center' },
   ];
 
+  useEffect(() => {
+    handleArticlesList();
+  }, [currentPage]);
+
   const options = {
     columns: {
       render: {
-        edition: renderEdition,
-        players: renderPlayers,
-        teams: renderTeams,
-        matches: renderMatches,
-        customTags: renderTags,
-        imageUrl: renderThumbnailImage,
-        status: renderSatus,
         action: renderActions,
+        schedule: renderDate,
+        imageUrl: renderThumbnailImage,
+        articles_type: renderArticle,
+        content: renderContent,
+        status: renderSatus,
       },
     },
   };
 
-  function renderEdition(value, row) {
-    return <span>{row.edition?.join(', ')} </span>;
-  }
-  function renderPlayers(value, row) {
-    return <span>{row.players?.join(', ')} </span>;
-  }
-  function renderTeams(value, row) {
-    return <span>{row.teams?.join(', ')} </span>;
-  }
-  function renderMatches(value, row) {
-    return <span>{row.matches?.join(', ')} </span>;
-  }
-  function renderTags(value, row) {
-    return <>{(row.customTags?.length > 0 && <span>{row.customTags?.join(', ')} </span>) || 'N/A'}</>;
+  function renderSatus(value, row) {
+    const statusColors = {
+      Published: 'success',
+      Unpublished: 'danger',
+    };
+
+    return (
+      <>
+        <Badge pill bg={statusColors[row.status]} className="fs_12">
+          {row.status}
+        </Badge>
+      </>
+    );
   }
 
   function renderThumbnailImage(value, row) {
@@ -83,15 +86,39 @@ function PhotoTagging() {
     );
   }
 
+  function renderContent(value, row) {
+    const trimmedContent = row.content.length > 450 ? `${row.content.slice(0, 450)}...` : row.content;
+    return <>{parse(trimmedContent)}</>;
+  }
+
+  function renderDate(value, row) {
+    return <span className="text-nowrap">{moment(row.schedule).format('DD MMMM YYYY')} </span>;
+  }
+
+  function renderArticle(value, row) {
+    return <span>{row.articles_type?.join(', ')} </span>;
+  }
+
+  const handleArticlesList = async () => {
+    setLoading(true);
+    const res = await getArticlesList();
+    if (res.status) {
+      const data = res.data;
+      setArticlesData(data);
+    }
+    setLoading(false);
+  };
+
   function renderActions(value, row) {
     const handleDeleteModal = () => {
       setDeleteId(row);
       setShowModal(true);
     };
+
     return (
       <>
         <div className="action_btn text-nowrap">
-          <Link href={`photo-tagging/${row.id}?page=${currentPage}`}>
+          <Link href={`articles/${row.id}?page=${currentPage}`}>
             <FontAwesomeIcon
               title="Edit"
               icon={faEdit}
@@ -113,54 +140,42 @@ function PhotoTagging() {
     );
   }
 
-  function renderSatus(value, row) {
-    const statusColors = {
-      Active: 'success',
-      Inactive: 'danger',
-    };
-
-    return (
-      <>
-        <Badge pill bg={statusColors[row.status]} className="fs_12">
-          {row.status}
-        </Badge>
-      </>
-    );
-  }
-
-  useEffect(() => {
-    handlePhotoList();
-  }, [currentPage]);
-
-  const handlePhotoList = async (e) => {
-    setLoading(true);
-    const res = await getPhotoTaggingsList();
-    if (res.status) {
-      const data = res.data;
-      setPhotoTaggingData(data);
-    }
-    setLoading(false);
-  };
-
   const handleDelete = async (e) => {
     const params = {
       id: deleteId.id,
     };
     setLoading(true);
     setCurrentPage(1);
-    const res = await deletePhotoTaggings(params);
+    const res = await deleteArticles(params);
     if (res?.status) {
       toast.success(res?.message);
       setShowModal(false);
-      handlePhotoList();
+      handleArticlesList();
     } else {
       toast.error(res?.message);
     }
     setLoading(false);
   };
 
+  function ModalGallery() {
+    return (
+      <>
+        <Modal show={show} centered size="lg" onHide={() => setShow(false)}>
+          <Modal.Header closeButton className="fw-semibold">
+            Full Content
+          </Modal.Header>
+          <Modal.Body>
+            <div className=""></div>
+          </Modal.Body>
+        </Modal>
+      </>
+    );
+  }
+
   return (
     <>
+      {show && <ModalGallery />}
+
       {showModal && (
         <DeleteModal
           {...{
@@ -169,7 +184,7 @@ function PhotoTagging() {
             loading,
             closeModal: () => setShowModal(false),
             handleDelete,
-            text: 'photo tagging',
+            text: 'article',
           }}
         />
       )}
@@ -179,18 +194,18 @@ function PhotoTagging() {
             <Card className="bg-white">
               <Card.Body className="p-4">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">
-                  <h4 className="fw-bold mb-0">Photo Tagging</h4>
-                  <Link className="common_btn text-white px-3 py-1 rounded-2" href="/photo-tagging/add">
+                  <h4 className="fw-bold mb-0">Articles</h4>
+                  <Link className="common_btn text-white px-3 py-1 rounded-2" href="/articles/add">
                     <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} className="me-1" /> Add
                   </Link>
                 </div>
-                {(!loading && photoTaggingData && (
+                {(!loading && articlesData && (
                   <CustomDataTable
-                    rows={photoTaggingData}
-                    columns={columns}
-                    options={options}
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
+                    rows={articlesData}
+                    columns={columns}
+                    options={options}
                   />
                 )) || <TableLoader />}
               </Card.Body>
@@ -202,4 +217,4 @@ function PhotoTagging() {
   );
 }
 
-export default PhotoTagging;
+export default Articles;

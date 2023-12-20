@@ -102,7 +102,7 @@ select {
     height: 100px;
   }
 }
-.dropdown_height{
+.dropdown_height {
   height: 250px;
 }
 
@@ -238,4 +238,8 @@ select {
     background: $purple !important;
     color: #fff !important;
   }
+}
+
+.tox-statusbar {
+  display: none !important;
 }

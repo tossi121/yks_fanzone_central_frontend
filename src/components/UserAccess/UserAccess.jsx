@@ -18,9 +18,17 @@ function UserAccess() {
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-
+ 
   const router = useRouter();
   const { page } = router.query;
+
+  useEffect(() => {
+    if (page) {
+      setCurrentPage(Number(page));
+      router.replace('/user-access');
+    }
+  }, [page]);
+
 
   const columns = [
     { heading: 'Id', field: 'serialNumber' },

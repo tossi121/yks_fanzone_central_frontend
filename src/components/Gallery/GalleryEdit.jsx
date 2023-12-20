@@ -13,10 +13,6 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment';
 
-import dynamic from 'next/dynamic';
-
-
-
 function GalleryEdit({ id }) {
   const galleryId = id;
   const [formValues, setFormValues] = useState({ title: '', description: '', status: 'Published' });
@@ -102,8 +98,8 @@ function GalleryEdit({ id }) {
 
   const handleUpload = async (files, setFiles, existingFiles = []) => {
     try {
-      const folderName = Array.isArray(files) ? '/gallery-images' : '/gallery-thumbnail';
-      const formData = createFormData(files, folderName, existingFiles); 
+      const folderName = Array.isArray(files) ? '/gallery_images' : '/gallery_thumbnail';
+      const formData = createFormData(files, folderName, existingFiles);
       const headers = getHeaders();
 
       const response = await axios.post(
@@ -391,7 +387,9 @@ function GalleryEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Upload Thumbnail</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(thumbnailLoading &&  <Spinner animation="border" size="lg" variant="primary" className="spinner" />) || (
+                          {(thumbnailLoading && (
+                            <Spinner animation="border" size="lg" variant="primary" className="spinner" />
+                          )) || (
                             <>
                               {(thumbnailFile && (
                                 <>
@@ -443,7 +441,9 @@ function GalleryEdit({ id }) {
                       <Form.Label className="blue_dark fw-medium">Upload Images</Form.Label>
                       <div className="mb-3">
                         <div className="file_upload p-3 d-flex justify-content-center flex-column align-items-center">
-                          {(imgLoading &&  <Spinner animation="border" size="lg" variant="primary" className="spinner" />) || (
+                          {(imgLoading && (
+                            <Spinner animation="border" size="lg" variant="primary" className="spinner" />
+                          )) || (
                             <>
                               <div className="d-flex flex-wrap align-items-center gap-3 justify-content-center">
                                 {(addImageFile?.length > 0 &&

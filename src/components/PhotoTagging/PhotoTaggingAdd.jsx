@@ -15,7 +15,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
-import toast from 'react-hot-toast';
 
 const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
@@ -268,6 +267,7 @@ function PhotoTaggingAdd() {
                         )}
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Status</Form.Label>
                       <div className="mb-3">

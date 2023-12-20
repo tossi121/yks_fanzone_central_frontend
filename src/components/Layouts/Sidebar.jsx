@@ -7,6 +7,7 @@ import {
   faChevronRight,
   faImages,
   faNewspaper,
+  faNoteSticky,
   faPhotoFilm,
   faUser,
   faUserFriends,
@@ -19,6 +20,7 @@ const links = [
   { href: '/gallery', tokenKey: 'manage_gallery', label: 'Gallery', iconSrc: faImages },
   { href: '/player-profile', tokenKey: 'manage_player_profile', label: 'Player Profile', iconSrc: faUserFriends },
   { href: '/user-access', tokenKey: 'create_user', label: 'User Access', iconSrc: faUser },
+  { href: '/articles', tokenKey: 'create_user', label: 'Articles', iconSrc: faNoteSticky },
   { href: '/photo-tagging', tokenKey: 'create_user', label: 'Photo Tagging', iconSrc: faPhotoFilm },
   { href: '/video-tagging', tokenKey: 'create_user', label: 'Video Tagging', iconSrc: faVideo },
 ];

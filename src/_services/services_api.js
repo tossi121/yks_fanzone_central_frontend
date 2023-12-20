@@ -269,3 +269,51 @@ export async function updatePhotoTagging(id, params) {
     return null;
   }
 }
+
+export async function getArticlesList(params) {
+  try {
+    const response = await fetcher('GET', process.env.PHOTO_ARTICLES_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function addArticles(params) {
+  try {
+    const response = await fetcher('POST', process.env.PHOTO_ARTICLES_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function deleteArticles(params) {
+  try {
+    const response = await fetcher('POST', process.env.PHOTO_ARTICLES_DELETE_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+
+export async function currentArticles(id) {
+  try {
+    const url = `${process.env.PHOTO_ARTICLES_DATA}/${id}`;
+    const response = await fetcher('GET', url);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function updateArticles(id, params) {
+  try {
+    const url = `${process.env.PHOTO_ARTICLES_UPDATE_DATA}/${id}`;
+    const response = await fetcher('POST', url, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}

@@ -11,6 +11,7 @@ const nextConfig = {
   env: {
     BASE_API_URL: 'http://192.168.1.46:7012/',
     IMAGE_BASE: 'https://yks-contents.s3.ap-south-1.amazonaws.com/',
+    TINYMCE_API_KEY: 'zmrizzmd4j65mm6bn8p7t5pj5wbcbboia2x7ggmezulk3thg',
     LOGIN_DATA: 'login',
 
     // Press Releases
@@ -45,6 +46,10 @@ const nextConfig = {
     PHOTO_TAGGINGS_ADD_DATA: 'admin/photoTagging',
     PHOTO_TAGGINGS_DELETE_DATA: 'admin/photoTaggingDelete',
     PHOTO_TAGGINGS_UPDATE_DATA: 'admin/photoTaggingUpdate',
+    // articles
+    PHOTO_ARTICLES_DATA: 'admin/articles',
+    PHOTO_ARTICLES_DELETE_DATA: 'admin/articlesDelete',
+    PHOTO_ARTICLES_UPDATE_DATA: 'admin/articlesUpdate',
   },
 };
 

@@ -148,6 +148,7 @@ function Gallery() {
     setLoading(false);
   };
 
+  
   return (
     <>
       {showModal && (
