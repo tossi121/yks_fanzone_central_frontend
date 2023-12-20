@@ -65,8 +65,8 @@ function GalleryAdd() {
 
   const handleUpload = async (files, setFiles, existingFiles = []) => {
     try {
-      const folderName = Array.isArray(files) ? 'yks/gallery-images' : 'yks/gallery-thumbnail';
-      const formData = createFormData(files, folderName, existingFiles); // Pass existingFiles
+      const folderName = Array.isArray(files) ? '/gallery-images' : '/gallery-thumbnail';
+      const formData = createFormData(files, folderName, existingFiles);
       const headers = getHeaders();
 
       const response = await axios.post(

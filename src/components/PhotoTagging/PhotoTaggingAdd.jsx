@@ -61,7 +61,7 @@ function PhotoTaggingAdd() {
 
   const handleUpload = async (file, setFile) => {
     try {
-      const folderName = setFile === setThumbnailFile ? 'yks/photo_tagging' : '';
+      const folderName = setFile === setThumbnailFile ? '/photo_tagging' : '';
       const formData = createFormData(file, folderName);
       const headers = getHeaders();
 

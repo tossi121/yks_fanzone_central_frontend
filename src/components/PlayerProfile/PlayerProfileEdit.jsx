@@ -144,7 +144,7 @@ function PlayerProfileEdit({ id }) {
 
   const handleUpload = async (file, setFile) => {
     try {
-      const folderName = setFile === setThumbnailFile ? 'yks/player_profile' : '';
+      const folderName = setFile === setThumbnailFile ? '/player_profile' : '';
       const formData = createFormData(file, folderName);
       const headers = getHeaders();
 

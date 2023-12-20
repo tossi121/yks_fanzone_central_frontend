@@ -10,7 +10,7 @@ const nextConfig = {
   },
   env: {
     BASE_API_URL: 'http://192.168.1.46:7012/',
-    IMAGE_BASE: 'http://ec2-13-201-102-143.ap-south-1.compute.amazonaws.com/',
+    IMAGE_BASE: 'https://yks-contents.s3.ap-south-1.amazonaws.com/',
     LOGIN_DATA: 'login',
 
     // Press Releases

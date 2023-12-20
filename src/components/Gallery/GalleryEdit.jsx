@@ -102,8 +102,8 @@ function GalleryEdit({ id }) {
 
   const handleUpload = async (files, setFiles, existingFiles = []) => {
     try {
-      const folderName = Array.isArray(files) ? 'yks/gallery-images' : 'yks/gallery-thumbnail';
-      const formData = createFormData(files, folderName, existingFiles); // Pass existingFiles
+      const folderName = Array.isArray(files) ? '/gallery-images' : '/gallery-thumbnail';
+      const formData = createFormData(files, folderName, existingFiles); 
       const headers = getHeaders();
 
       const response = await axios.post(
@@ -234,7 +234,7 @@ function GalleryEdit({ id }) {
         name_of_group: formValues.title,
         description_of_gallery: formValues.description,
         images: addImageFile,
-        thumbnailImage: thumbnailFile?.includes('yks/gallery-thumbnail') ? thumbnailFile : thumbnailFile?.[0],
+        thumbnailImage: thumbnailFile?.includes('/gallery-thumbnail') ? thumbnailFile : thumbnailFile?.[0],
         publishDate: moment(publishDate).format('YYYY-MM-DD'),
         status: formValues.status,
       };
