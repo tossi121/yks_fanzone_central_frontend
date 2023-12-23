@@ -3,21 +3,20 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 
-const PhotoTaggingEdit = dynamic(import('@/components/PhotoTagging/PhotoTaggingEdit'));
+const VideoTaggingAdd = dynamic(import('@/components/VideoTagging/VideoTaggingAdd'));
 
 function DefaultPage() {
   const router = useRouter();
   const token = Cookies.get('yks_fanzone_central_permissions');
   const tokenValues = token?.split(',');
-  const id = router.query.id;
 
   useEffect(() => {
-    if (!tokenValues.includes('manage_photoTagging')) {
+    if (!tokenValues.includes('manage_videoTagging')) {
       router.push('/');
     }
   }, [router]);
 
-  return <PhotoTaggingEdit id={id?.[0]} />;
+  return <VideoTaggingAdd />;
 }
 DefaultPage.layout = 'DashboardLayout';
 export default DefaultPage;

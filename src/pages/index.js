@@ -7,6 +7,9 @@ const routeMapping = {
   manage_gallery: '/gallery',
   manage_player_profile: '/player-profile',
   create_user: '/user-access',
+  manage_articles: '/articles',
+  manage_photoTagging: '/photo-tagging',
+  manage_videoTagging: '/video-tagging',
 };
 
 export default function Home() {

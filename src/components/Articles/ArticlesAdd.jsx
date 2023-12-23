@@ -361,7 +361,7 @@ function ArticlesAdd() {
                       </div>
                     </Col>
                     <Col lg={12}>
-                      <Button variant="" className="px-4 text-white common_btn" disabled={loading} type="submit">
+                      <Button variant="" className="px-4 text-white common_btn shadow-none" disabled={loading} type="submit">
                         Publish
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>

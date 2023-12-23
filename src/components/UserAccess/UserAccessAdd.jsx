@@ -51,6 +51,7 @@ function UserAccessAdd() {
         email: formValues.email,
         password: formValues.password,
         permissions: formValues.role,
+        user_role: 'admin',
         status: formValues.status,
       };
 
@@ -279,7 +280,7 @@ function UserAccessAdd() {
                     </Col>
 
                     <Col lg={12}>
-                      <Button variant="" className="px-4 text-white common_btn" disabled={loading} type="submit">
+                      <Button variant="" className="px-4 text-white common_btn shadow-none" disabled={loading} type="submit">
                         Create
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>

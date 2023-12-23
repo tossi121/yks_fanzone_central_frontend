@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { deletePhotoTaggings, getPhotoTaggingsList } from '@/_services/services_api';
+import { deleteVideoTaggings, getVideoTaggingsList } from '@/_services/services_api';
 import { Badge, Card, Col, Container, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dynamic from 'next/dynamic';
@@ -13,7 +13,7 @@ const CustomDataTable = dynamic(import('../DataTable/CustomDataTable'));
 const DeleteModal = dynamic(import('../DeleteModal'));
 const TableLoader = dynamic(import('../DataTable/TableLoader'));
 
-function PhotoTagging() {
+function VideoTagging() {
   const [photoTaggingData, setPhotoTaggingData] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
@@ -26,17 +26,17 @@ function PhotoTagging() {
   useEffect(() => {
     if (page) {
       setCurrentPage(Number(page));
-      router.replace('/photo-tagging');
+      router.replace('/video-tagging');
     }
   }, [page]);
 
   const columns = [
     { heading: 'Id', field: 'serialNumber' },
-    { heading: 'Photo', field: 'imageUrl' },
     { heading: 'Edition', field: 'edition' },
     { heading: 'Players', field: 'players' },
     { heading: 'Teams', field: 'teams' },
     { heading: 'Matches', field: 'matches' },
+    // { heading: 'Categories', field: 'categories' },
     // { heading: 'Other Tags', field: 'customTags' },
     { heading: 'Status', field: 'status' },
     { heading: 'Action', field: 'action', align: 'center' },
@@ -49,7 +49,6 @@ function PhotoTagging() {
         players: renderPlayers,
         teams: renderTeams,
         matches: renderMatches,
-        imageUrl: renderThumbnailImage,
         status: renderSatus,
         action: renderActions,
       },
@@ -72,15 +71,6 @@ function PhotoTagging() {
     return <>{(row.customTags?.length > 0 && <span>{row.customTags?.join(', ')} </span>) || 'N/A'}</>;
   }
 
-  function renderThumbnailImage(value, row) {
-    return (
-      <>
-        {(row.imageUrl && (
-          <Image src={process.env.IMAGE_BASE + row.imageUrl} width={50} height={50} alt="thumbnailImage" />
-        )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={25} height={25} />}
-      </>
-    );
-  }
 
   function renderActions(value, row) {
     const handleDeleteModal = () => {
@@ -90,7 +80,7 @@ function PhotoTagging() {
     return (
       <>
         <div className="action_btn text-nowrap">
-          <Link href={`photo-tagging/${row.id}?page=${currentPage}`}>
+          <Link href={`video-tagging/${row.id}?page=${currentPage}`}>
             <FontAwesomeIcon
               title="Edit"
               icon={faEdit}
@@ -133,7 +123,7 @@ function PhotoTagging() {
 
   const handlePhotoList = async (e) => {
     setLoading(true);
-    const res = await getPhotoTaggingsList();
+    const res = await getVideoTaggingsList();
     if (res.status) {
       const data = res.data;
       setPhotoTaggingData(data);
@@ -147,7 +137,7 @@ function PhotoTagging() {
     };
     setLoading(true);
     setCurrentPage(1);
-    const res = await deletePhotoTaggings(params);
+    const res = await deleteVideoTaggings(params);
     if (res?.status) {
       toast.success(res?.message);
       setShowModal(false);
@@ -168,7 +158,7 @@ function PhotoTagging() {
             loading,
             closeModal: () => setShowModal(false),
             handleDelete,
-            text: 'photo tagging',
+            text: 'video tagging',
           }}
         />
       )}
@@ -178,8 +168,8 @@ function PhotoTagging() {
             <Card className="bg-white">
               <Card.Body className="p-4">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">
-                  <h4 className="fw-bold mb-0">Photo Tagging</h4>
-                  <Link className="common_btn text-white px-3 py-1 rounded-2" href="/photo-tagging/add">
+                  <h4 className="fw-bold mb-0">Video Tagging</h4>
+                  <Link className="common_btn text-white px-3 py-1 rounded-2" href="/video-tagging/add">
                     <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} className="me-1" /> Add
                   </Link>
                 </div>
@@ -201,4 +191,4 @@ function PhotoTagging() {
   );
 }
 
-export default PhotoTagging;
+export default VideoTagging;

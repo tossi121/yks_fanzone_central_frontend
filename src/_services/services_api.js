@@ -10,7 +10,6 @@ export async function getLogin(params) {
 }
 
 // Press Releases
-
 export async function geTournamentList(params) {
   try {
     const response = await fetcher('GET', process.env.TOURNAMENT_LIST_DATA, params);
@@ -68,7 +67,6 @@ export async function updatePressRelease(id, params) {
 }
 
 // Gallery
-
 export async function getGalleryList(params) {
   try {
     const response = await fetcher('GET', process.env.GALLERY_DATA, params);
@@ -80,7 +78,7 @@ export async function getGalleryList(params) {
 
 export async function addGallery(params) {
   try {
-    const response = await fetcher('POST', process.env.GALLERY_ADD_DATA, params);
+    const response = await fetcher('POST', process.env.GALLERY_DATA, params);
     return response;
   } catch (err) {
     return null;
@@ -108,7 +106,7 @@ export async function deleteGallery(params) {
 
 export async function updateGallery(id, params) {
   try {
-    const url = `${process.env.GALLERY_DATA}/${id}`;
+    const url = `${process.env.GALLERY_UPDATE_DATA}/${id}`;
     const response = await fetcher('POST', url, params);
     return response;
   } catch (err) {
@@ -117,7 +115,6 @@ export async function updateGallery(id, params) {
 }
 
 // Player Profile
-
 export async function getPlayerProfileList(params) {
   try {
     const response = await fetcher('GET', process.env.PLAYER_PROFILE_DATA, params);
@@ -223,6 +220,7 @@ export async function getMatchList(params) {
 }
 
 // photoTaggings
+
 export async function getPhotoTaggingsList(params) {
   try {
     const response = await fetcher('GET', process.env.PHOTO_TAGGINGS_DATA, params);
@@ -269,10 +267,10 @@ export async function updatePhotoTagging(id, params) {
     return null;
   }
 }
-
+// Articles
 export async function getArticlesList(params) {
   try {
-    const response = await fetcher('GET', process.env.PHOTO_ARTICLES_DATA, params);
+    const response = await fetcher('GET', process.env.ARTICLES_DATA, params);
     return response;
   } catch (err) {
     return null;
@@ -281,7 +279,7 @@ export async function getArticlesList(params) {
 
 export async function addArticles(params) {
   try {
-    const response = await fetcher('POST', process.env.PHOTO_ARTICLES_DATA, params);
+    const response = await fetcher('POST', process.env.ARTICLES_DATA, params);
     return response;
   } catch (err) {
     return null;
@@ -290,17 +288,16 @@ export async function addArticles(params) {
 
 export async function deleteArticles(params) {
   try {
-    const response = await fetcher('POST', process.env.PHOTO_ARTICLES_DELETE_DATA, params);
+    const response = await fetcher('POST', process.env.ARTICLES_DELETE_DATA, params);
     return response;
   } catch (err) {
     return null;
   }
 }
 
-
 export async function currentArticles(id) {
   try {
-    const url = `${process.env.PHOTO_ARTICLES_DATA}/${id}`;
+    const url = `${process.env.ARTICLES_DATA}/${id}`;
     const response = await fetcher('GET', url);
     return response;
   } catch (err) {
@@ -310,7 +307,55 @@ export async function currentArticles(id) {
 
 export async function updateArticles(id, params) {
   try {
-    const url = `${process.env.PHOTO_ARTICLES_UPDATE_DATA}/${id}`;
+    const url = `${process.env.ARTICLES_UPDATE_DATA}/${id}`;
+    const response = await fetcher('POST', url, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+// Video Tagging
+export async function getVideoTaggingsList(params) {
+  try {
+    const response = await fetcher('GET', process.env.VIDEO_TAGGINGS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function currentVideoTagging(id) {
+  try {
+    const url = `${process.env.VIDEO_TAGGINGS_DATA}/${id}`;
+    const response = await fetcher('GET', url);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function addVideoTaggings(params) {
+  try {
+    const response = await fetcher('POST', process.env.VIDEO_TAGGINGS_ADD_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function deleteVideoTaggings(params) {
+  try {
+    const response = await fetcher('POST', process.env.VIDEO_TAGGINGS_DELETE_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function updateVideoTagging(id, params) {
+  try {
+    const url = `${process.env.VIDEO_TAGGINGS_UPDATE_DATA}/${id}`;
     const response = await fetcher('POST', url, params);
     return response;
   } catch (err) {

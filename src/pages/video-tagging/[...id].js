@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 
-const PhotoTaggingEdit = dynamic(import('@/components/PhotoTagging/PhotoTaggingEdit'));
+const VideoTaggingEdit = dynamic(import('@/components/VideoTagging/VideoTaggingEdit'));
 
 function DefaultPage() {
   const router = useRouter();
@@ -12,12 +12,12 @@ function DefaultPage() {
   const id = router.query.id;
 
   useEffect(() => {
-    if (!tokenValues.includes('manage_photoTagging')) {
+    if (!tokenValues.includes('manage_videoTagging')) {
       router.push('/');
     }
   }, [router]);
 
-  return <PhotoTaggingEdit id={id?.[0]} />;
+  return <VideoTaggingEdit id={id?.[0]} />;
 }
 DefaultPage.layout = 'DashboardLayout';
 export default DefaultPage;

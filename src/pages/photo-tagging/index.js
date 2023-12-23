@@ -11,7 +11,7 @@ function DefaultPage() {
   const tokenValues = token?.split(',');
 
   useEffect(() => {
-    if (!tokenValues.includes('manage_press_release')) {
+    if (!tokenValues.includes('manage_photoTagging')) {
       router.push('/');
     }
   }, [router]);

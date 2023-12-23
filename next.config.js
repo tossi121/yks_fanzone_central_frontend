@@ -12,6 +12,7 @@ const nextConfig = {
     BASE_API_URL: 'http://192.168.1.46:7012/',
     IMAGE_BASE: 'https://yks-contents.s3.ap-south-1.amazonaws.com/',
     TINYMCE_API_KEY: 'zmrizzmd4j65mm6bn8p7t5pj5wbcbboia2x7ggmezulk3thg',
+    YOUTUBE_API_KEY: 'AIzaSyD9RSUKhdwSpXcOapnhC1sL-eWn0z9nNIw',
     LOGIN_DATA: 'login',
 
     // Press Releases
@@ -22,9 +23,9 @@ const nextConfig = {
     TOURNAMENT_LIST_DATA: 'admin/getAllNamesAndIds',
 
     // Gallery
-    GALLERY_DATA: 'admin/getallgalleries',
-    GALLERY_ADD_DATA: 'admin/addgallery',
-    GALLERY_DELETE_DATA: 'admin/deletegallery',
+    GALLERY_DATA: 'admin/galleries',
+    GALLERY_DELETE_DATA: 'admin/galleriesDelete',
+    GALLERY_UPDATE_DATA: 'admin/galleriesUpdate',
 
     // Player Profile
     PLAYER_PROFILE_DATA: 'admin/playerprofiles',
@@ -39,17 +40,26 @@ const nextConfig = {
 
     // allteams
     TEAM_DATA: 'admin/allteams',
+
     // matches
     MATCH_DATA: 'admin/matches',
+
     // photoTaggings
     PHOTO_TAGGINGS_DATA: 'admin/photoTaggings',
     PHOTO_TAGGINGS_ADD_DATA: 'admin/photoTagging',
     PHOTO_TAGGINGS_DELETE_DATA: 'admin/photoTaggingDelete',
     PHOTO_TAGGINGS_UPDATE_DATA: 'admin/photoTaggingUpdate',
+
     // articles
-    PHOTO_ARTICLES_DATA: 'admin/articles',
-    PHOTO_ARTICLES_DELETE_DATA: 'admin/articlesDelete',
-    PHOTO_ARTICLES_UPDATE_DATA: 'admin/articlesUpdate',
+    ARTICLES_DATA: 'admin/articles',
+    ARTICLES_DELETE_DATA: 'admin/articlesDelete',
+    ARTICLES_UPDATE_DATA: 'admin/articlesUpdate',
+    
+    //videoTagging
+    VIDEO_TAGGINGS_DATA: 'admin/videoTaggings',
+    VIDEO_TAGGINGS_ADD_DATA: 'admin/videoTagging',
+    VIDEO_TAGGINGS_DELETE_DATA: 'admin/videoTaggingsDelete',
+    VIDEO_TAGGINGS_UPDATE_DATA: 'admin/videoTaggingsUpdate',
   },
 };
 

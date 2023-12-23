@@ -12,7 +12,7 @@ function DefaultPage() {
   const id = router.query.id;
 
   useEffect(() => {
-    if (!tokenValues.includes('manage_press_release')) {
+    if (!tokenValues.includes('manage_articles')) {
       router.push('/');
     }
   }, [router]);
