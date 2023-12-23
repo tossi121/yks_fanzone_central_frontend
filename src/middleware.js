@@ -16,5 +16,15 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/', '/press-release/:path*', '/gallery/:path*', '/player-profile/:path*', '/user-access/:path*', '/login'],
+  matcher: [
+    '/',
+    '/press-release/:path*',
+    '/gallery/:path*',
+    '/player-profile/:path*',
+    '/user-access/:path*',
+    '/video-tagging/:path*',
+    '/photo-tagging/:path*',
+    '/articles/:path*',
+    '/login',
+  ],
 };
