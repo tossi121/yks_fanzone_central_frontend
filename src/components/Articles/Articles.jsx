@@ -38,7 +38,7 @@ function Articles() {
     { heading: 'Title', field: 'title' },
     { heading: 'Articles Type', field: 'articles_type' },
     // { heading: 'Tags', field: 'tags' },
-    { heading: 'Content', field: 'content' },
+    // { heading: 'Content', field: 'content' },
     // { heading: 'Schedule', field: 'schedule' },
     { heading: 'Status', field: 'status' },
     { heading: 'Action', field: 'action', align: 'center' },

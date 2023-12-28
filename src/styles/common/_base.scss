@@ -243,7 +243,10 @@ select {
 .tox-statusbar {
   display: none !important;
 }
-.category_btn{
+.category_btn {
   width: 35px;
   height: 35px;
+}
+.tox .tox-notification--in {
+  opacity: 0 !important;
 }
