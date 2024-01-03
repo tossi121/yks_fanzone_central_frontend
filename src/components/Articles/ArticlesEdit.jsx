@@ -1,4 +1,4 @@
-import { updateArticles, currentArticles } from '@/_services/services_api';
+import { updateArticles, currentArticles, getCustomTagsList } from '@/_services/services_api';
 import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -13,10 +13,19 @@ import 'react-datepicker/dist/react-datepicker.css';
 import ReactDatePicker from 'react-datepicker';
 import toast from 'react-hot-toast';
 import { Editor } from '@tinymce/tinymce-react';
+import dynamic from 'next/dynamic';
+import CustomMultiSelectDropdown from '../CustomMultiSelectDropdown';
+
+const CustomTagsAdd = dynamic(import('../CustomTags/CustomTagsAdd'));
+const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
 function ArticlesEdit({ id }) {
   const articlesId = id;
-  const [formValues, setFormValues] = useState({ title: '', articleType: [], tags: '', status: 'Published' });
+  const [formValues, setFormValues] = useState({
+    title: '',
+    articleType: 'Normal Article',
+    status: 'Published',
+  });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -25,14 +34,28 @@ function ArticlesEdit({ id }) {
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [pageContent, setPageContent] = useState('');
   const [currentArticlesData, setCurrentArticlesData] = useState(null);
+  const [tagsData, setTagsData] = useState([]);
+  const [selectedTags, setSelectedTags] = useState('');
+  const [show, setShow] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
     if (articlesId) {
       handleCurrentArticles();
+      handleTagsList();
     }
   }, [articlesId]);
+
+  const handleTagsList = async (e) => {
+    setLoading(true);
+    const res = await getCustomTagsList();
+    if (res?.status) {
+      const data = res.data;
+      setTagsData(data);
+    }
+    setLoading(false);
+  };
 
   const handleCurrentArticles = async () => {
     const res = await currentArticles(articlesId);
@@ -47,10 +70,11 @@ function ArticlesEdit({ id }) {
       const values = {
         title: currentArticlesData?.title || '',
         status: currentArticlesData?.status || '',
-        tags: currentArticlesData?.tags || '',
         articleType: currentArticlesData?.articles_type || '',
       };
       setFormValues(values);
+      // const articleWithNames = currentArticlesData?.tags.map((tags) => ({ tags }));
+      setSelectedTags(currentArticlesData?.tags);
       const date = new Date(currentArticlesData?.schedule || '');
       if (!isNaN(date.getTime())) {
         setScheduleDate(date);
@@ -72,9 +96,9 @@ function ArticlesEdit({ id }) {
         title: formValues.title,
         imageUrl: thumbnailFile,
         articles_type: formValues.articleType,
-        tags: formValues.tags,
+        tags: selectedTags.map((i) => i.tag),
         content: pageContent.level?.content,
-        schedule: moment(scheduleDate).format('YYYY-MM-DD'),
+        schedule: moment(scheduleDate).format('YYYY-MM-DD HH:mm:ss'),
         status: formValues.status,
       };
 
@@ -184,23 +208,38 @@ function ArticlesEdit({ id }) {
     return errors;
   };
 
-  const handleArticlesChange = (permission) => {
-    setFormValues((prevFormValues) => {
-      if (prevFormValues.articleType.includes(permission)) {
-        return {
-          ...prevFormValues,
-          articleType: prevFormValues.articleType.filter((item) => item !== permission),
-        };
-      } else {
-        return {
-          ...prevFormValues,
-          articleType: [...prevFormValues.articleType, permission],
-        };
-      }
-    });
+  const filterPassedTime = (time) => {
+    const currentDate = new Date();
+    const selectedDate = new Date(time);
+
+    return currentDate.getTime() < selectedDate.getTime();
   };
+
+  const [selectedEducation, setSelectedEducation] = useState([]);
+  const [selectedEducationId, setSelectedEducationId] = useState([]);
+
+
+  const handleSelectedItems = (id, name) => {
+    if (!selectedEducationId.includes(id)) {
+      setSelectedEducation([...selectedEducation, name]);
+      setSelectedEducationId([...selectedEducationId, id]);
+    } else {
+      setSelectedEducation(selectedEducation.filter((tag) => tag !== name));
+      setSelectedEducationId(selectedEducationId.filter((tagId) => tagId !== id));
+    }
+  };
+
   return (
     <>
+      {show && (
+        <CustomTagsAdd
+          {...{
+            show,
+            handleTagsList,
+            handleClose: () => setShow(false),
+          }}
+        />
+      )}
       <Container fluid>
         <Row>
           <Col>
@@ -211,7 +250,7 @@ function ArticlesEdit({ id }) {
             <Card className="bg-white mt-3">
               <Card.Body className="p-4">
                 <div className="d-flex justify-content-between align-items-center">
-                  <h4 className="fw-bold mb-0">Add Articles</h4>
+                  <h4 className="fw-bold mb-0">Edit Articles</h4>
                 </div>
                 <Form autoComplete="off" className="mt-3" onSubmit={handleSubmit}>
                   <Row className="align-items-baseline">
@@ -233,30 +272,44 @@ function ArticlesEdit({ id }) {
                     </Col>
 
                     <Col lg={6}>
+                      <Form.Label className="blue_dark fw-medium">Article Type</Form.Label>
                       <div className="mb-3">
-                        <Form.Label className="blue_dark fw-medium">Select Article Type</Form.Label>
-                        <Form.Group>
-                          {['Normal Article', 'Fantasy Article', 'Short News'].map((item, key) => (
-                            <Form.Label
-                              key={key}
-                              className="cursor_pointer slate_gray fs_14 user-select-none me-3 text-capitalize"
-                              htmlFor={item}
-                            >
-                              <input
-                                type="checkbox"
-                                name={item}
-                                id={item}
-                                className="form-check-input me-2 shadow-none border"
-                                checked={formValues.articleType.includes(item)}
-                                onChange={() => handleArticlesChange(item)}
-                              />
-                              {item}
-                            </Form.Label>
-                          ))}
-                        </Form.Group>
-                        {formErrors.articleType && <p className="text-danger fs_13 mt-1">{formErrors.articleType}</p>}
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Normal Article"
+                          type="radio"
+                          id="Normal Article"
+                          value="Normal Article"
+                          checked={formValues.articleType === 'Normal Article'}
+                          onChange={handleChange}
+                          name="articleType"
+                        />
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Fantasy Article"
+                          type="radio"
+                          id="Fantasy Article"
+                          value="Fantasy Article"
+                          checked={formValues.articleType === 'Fantasy Article'}
+                          onChange={handleChange}
+                          name="articleType"
+                        />
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Short News"
+                          type="radio"
+                          id="Short News"
+                          value="Short News"
+                          checked={formValues.articleType === 'Short News'}
+                          onChange={handleChange}
+                          name="articleType"
+                        />
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Select Schedule Date</Form.Label>
                       <div className="mb-3 d-flex flex-column">
@@ -267,12 +320,14 @@ function ArticlesEdit({ id }) {
                           dropdownMode="select"
                           selected={scheduleDate}
                           onChange={(date) => setScheduleDate(date)}
-                          placeholderText="Select Schedule Date"
-                          showTimeSelect={false}
-                          dateFormat="dd MMM yyyy"
+                          placeholderText="Select Schedule Date and Time"
+                          showTimeSelect
+                          timeFormat="h:mm aa"
+                          dateFormat="dd MMM yyyy h:mm aa"
                           className="shadow-none fs_14 slate_gray"
                           onKeyDown={(e) => e.preventDefault()}
                           minDate={new Date()}
+                          filterTime={filterPassedTime}
                         />
                         {formErrors.scheduleDate && <p className="text-danger fs_13 mt-1">{formErrors.scheduleDate}</p>}
                       </div>
@@ -359,22 +414,31 @@ function ArticlesEdit({ id }) {
                       </div>
                     </Col>
 
-                    <Col lg={6}>
-                      <div className="mb-3">
-                        <Form.Group>
-                          <Form.Label className="blue_dark fw-medium">Enter Tags</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            name="tags"
-                            value={formValues.tags}
-                            onChange={handleChange}
-                            className="shadow-none fs_14 slate_gray textarea_description"
-                            placeholder="Enter tags"
+                    {/* <Col lg={6}>
+                      <Form.Group>
+                        <Form.Label className="blue_dark fw-medium">Select Tags</Form.Label>
+                        {tagsData && (
+                          <ReusableDropdown
+                            options={tagsData}
+                            selectedValueData={selectedTags.length > 0 && selectedTags}
+                            onSelect={setSelectedTags}
+                            placeholder="Tags"
+                            displayKey="tag"
+                            tagSelect={true}
+                            setShow={setShow}
                           />
-                          {formErrors.tags && <p className="text-danger fs_13 mt-1">{formErrors.tags}</p>}
-                        </Form.Group>
-                      </div>
-                    </Col>
+                        )}
+                      </Form.Group>
+                    </Col> */}
+{console.log(tagsData, 'tagsData')}
+                    <CustomMultiSelectDropdown
+                      placeholder="Select category"
+                      items={tagsData || []}
+                      selectedItems={selectedEducation}
+                      onItemToggle={handleSelectedItems}
+                      searchBy={true}
+                      selectedItemsId={selectedEducationId}
+                    />
 
                     <Col lg={12}>
                       <div className="mb-3">
@@ -397,8 +461,13 @@ function ArticlesEdit({ id }) {
                       </div>
                     </Col>
                     <Col lg={12}>
-                      <Button variant="" className="px-4 text-white common_btn shadow-none" disabled={loading} type="submit">
-                       Update
+                      <Button
+                        variant=""
+                        className="px-4 text-white common_btn shadow-none"
+                        disabled={loading}
+                        type="submit"
+                      >
+                        Update
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>
                     </Col>

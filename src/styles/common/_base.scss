@@ -204,13 +204,13 @@ select {
   }
 }
 
-
-.react-datepicker__time-list-item--selected,
-
+.react-datepicker__day--keyboard-selected,
 .react-datepicker__day--selected {
   background-color: $purple !important;
 }
 
+.react-datepicker__time-list-item--selected,
+.react-datepicker__day--keyboard-selected,
 .react-datepicker__year-text--keyboard-selected {
   background-color: $purple !important;
   color: #ffff !important;

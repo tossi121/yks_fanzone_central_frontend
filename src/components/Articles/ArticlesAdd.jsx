@@ -1,4 +1,4 @@
-import { addArticles } from '@/_services/services_api';
+import { addArticles, getCustomTagsList } from '@/_services/services_api';
 import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -7,18 +7,21 @@ import moment from 'moment';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 import ReactDatePicker from 'react-datepicker';
 import toast from 'react-hot-toast';
 import { Editor } from '@tinymce/tinymce-react';
+import dynamic from 'next/dynamic';
+
+const CustomTagsAdd = dynamic(import('../CustomTags/CustomTagsAdd'));
+const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
 function ArticlesAdd() {
   const [formValues, setFormValues] = useState({
     title: '',
     articleType: 'Normal Article',
-    tags: [],
     status: 'Published',
   });
   const [formErrors, setFormErrors] = useState({});
@@ -28,8 +31,25 @@ function ArticlesAdd() {
   const [thumbnailError, setThumbnailError] = useState(null);
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [pageContent, setPageContent] = useState('');
+  const [tagsData, setTagsData] = useState([]);
+  const [selectedTags, setSelectedTags] = useState('');
+  const [show, setShow] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    handleTagsList();
+  }, []);
+
+  const handleTagsList = async (e) => {
+    setLoading(true);
+    const res = await getCustomTagsList();
+    if (res?.status) {
+      const data = res.data;
+      setTagsData(data);
+    }
+    setLoading(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,9 +61,9 @@ function ArticlesAdd() {
         title: formValues.title,
         imageUrl: thumbnailFile,
         articles_type: formValues.articleType,
-        tags: formValues.tags,
+        tags: selectedTags.map((i) => i.tag),
         content: pageContent.level?.content,
-        schedule: moment(scheduleDate).format('YYYY-MM-DD'),
+        schedule: moment(scheduleDate).format('YYYY-MM-DD HH:mm:ss'),
         status: formValues.status,
       };
 
@@ -154,8 +174,24 @@ function ArticlesAdd() {
     return errors;
   };
 
+  const filterPassedTime = (time) => {
+    const currentDate = new Date();
+    const selectedDate = new Date(time);
+
+    return currentDate.getTime() < selectedDate.getTime();
+  };
+
   return (
     <>
+      {show && (
+        <CustomTagsAdd
+          {...{
+            show,
+            handleTagsList,
+            handleClose: () => setShow(false),
+          }}
+        />
+      )}
       <Container fluid>
         <Row>
           <Col>
@@ -239,11 +275,11 @@ function ArticlesAdd() {
                           placeholderText="Select Schedule Date and Time"
                           showTimeSelect
                           timeFormat="h:mm aa"
-                          timeIntervals={15}
                           dateFormat="dd MMM yyyy h:mm aa"
                           className="shadow-none fs_14 slate_gray"
                           onKeyDown={(e) => e.preventDefault()}
                           minDate={new Date()}
+                          filterTime={filterPassedTime}
                         />
                         {formErrors.scheduleDate && <p className="text-danger fs_13 mt-1">{formErrors.scheduleDate}</p>}
                       </div>
@@ -331,20 +367,21 @@ function ArticlesAdd() {
                     </Col>
 
                     <Col lg={6}>
-                      <div className="mb-3">
-                        <Form.Group>
-                          <Form.Label className="blue_dark fw-medium">Enter Tags</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            name="tags"
-                            value={formValues.tags}
-                            onChange={handleChange}
-                            className="shadow-none fs_14 slate_gray textarea_description"
-                            placeholder="Enter tags"
+                      <Form.Group>
+                        <Form.Label className="blue_dark fw-medium">Select Tags</Form.Label>
+                        {(tagsData && (
+                          <ReusableDropdown
+                            options={tagsData}
+                            selectedValueData={selectedTags}
+                            onSelect={setSelectedTags}
+                            placeholder="Tags"
+                            displayKey="tag"
+                            tagSelect={true}
+                            setShow={setShow}
                           />
-                          {formErrors.tags && <p className="text-danger fs_13 mt-1">{formErrors.tags}</p>}
-                        </Form.Group>
-                      </div>
+                        )) ||
+                          ''}
+                      </Form.Group>
                     </Col>
 
                     <Col lg={12}>
