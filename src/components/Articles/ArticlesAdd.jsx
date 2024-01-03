@@ -15,7 +15,12 @@ import toast from 'react-hot-toast';
 import { Editor } from '@tinymce/tinymce-react';
 
 function ArticlesAdd() {
-  const [formValues, setFormValues] = useState({ title: '', articleType: [], tags: '', status: 'Published' });
+  const [formValues, setFormValues] = useState({
+    title: '',
+    articleType: 'Normal Article',
+    tags: [],
+    status: 'Published',
+  });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -76,7 +81,7 @@ function ArticlesAdd() {
 
   const handleUpload = async (file, setFile) => {
     try {
-      const folderName = setFile === setThumbnailFile ? '/articles' : '/';
+      const folderName = setFile === setThumbnailFile ? 'articles' : '/';
       const formData = createFormData(file, folderName);
       const headers = getHeaders();
 
@@ -149,21 +154,6 @@ function ArticlesAdd() {
     return errors;
   };
 
-  const handleArticlesChange = (permission) => {
-    setFormValues((prevFormValues) => {
-      if (prevFormValues.articleType.includes(permission)) {
-        return {
-          ...prevFormValues,
-          articleType: prevFormValues.articleType.filter((item) => item !== permission),
-        };
-      } else {
-        return {
-          ...prevFormValues,
-          articleType: [...prevFormValues.articleType, permission],
-        };
-      }
-    });
-  };
   return (
     <>
       <Container fluid>
@@ -198,30 +188,44 @@ function ArticlesAdd() {
                     </Col>
 
                     <Col lg={6}>
+                      <Form.Label className="blue_dark fw-medium">Article Type</Form.Label>
                       <div className="mb-3">
-                        <Form.Label className="blue_dark fw-medium">Select Article Type</Form.Label>
-                        <Form.Group>
-                          {['Normal Article', 'Fantasy Article', 'Short News'].map((item, key) => (
-                            <Form.Label
-                              key={key}
-                              className="cursor_pointer slate_gray fs_14 user-select-none me-3 text-capitalize"
-                              htmlFor={item}
-                            >
-                              <input
-                                type="checkbox"
-                                name={item}
-                                id={item}
-                                className="form-check-input me-2 shadow-none border"
-                                checked={formValues.articleType.includes(item)}
-                                onChange={() => handleArticlesChange(item)}
-                              />
-                              {item}
-                            </Form.Label>
-                          ))}
-                        </Form.Group>
-                        {formErrors.articleType && <p className="text-danger fs_13 mt-1">{formErrors.articleType}</p>}
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Normal Article"
+                          type="radio"
+                          id="Normal Article"
+                          value="Normal Article"
+                          checked={formValues.articleType === 'Normal Article'}
+                          onChange={handleChange}
+                          name="articleType"
+                        />
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Fantasy Article"
+                          type="radio"
+                          id="Fantasy Article"
+                          value="Fantasy Article"
+                          checked={formValues.articleType === 'Fantasy Article'}
+                          onChange={handleChange}
+                          name="articleType"
+                        />
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Short News"
+                          type="radio"
+                          id="Short News"
+                          value="Short News"
+                          checked={formValues.articleType === 'Short News'}
+                          onChange={handleChange}
+                          name="articleType"
+                        />
                       </div>
                     </Col>
+
                     <Col lg={6}>
                       <Form.Label className="blue_dark fw-medium">Select Schedule Date</Form.Label>
                       <div className="mb-3 d-flex flex-column">
@@ -232,9 +236,11 @@ function ArticlesAdd() {
                           dropdownMode="select"
                           selected={scheduleDate}
                           onChange={(date) => setScheduleDate(date)}
-                          placeholderText="Select Schedule Date"
-                          showTimeSelect={false}
-                          dateFormat="dd MMM yyyy"
+                          placeholderText="Select Schedule Date and Time"
+                          showTimeSelect
+                          timeFormat="h:mm aa"
+                          timeIntervals={15}
+                          dateFormat="dd MMM yyyy h:mm aa"
                           className="shadow-none fs_14 slate_gray"
                           onKeyDown={(e) => e.preventDefault()}
                           minDate={new Date()}
@@ -350,6 +356,7 @@ function ArticlesAdd() {
                             onChange={(value) => setPageContent(value)}
                             apiKey={process.env.TINYMCE_API_KEY}
                             init={{
+                              menubar: false,
                               plugins:
                                 'anchor autolink charmap image link lists media searchreplace table visualblocks forecolor backcolor',
                               toolbar:
@@ -361,7 +368,12 @@ function ArticlesAdd() {
                       </div>
                     </Col>
                     <Col lg={12}>
-                      <Button variant="" className="px-4 text-white common_btn shadow-none" disabled={loading} type="submit">
+                      <Button
+                        variant=""
+                        className="px-4 text-white common_btn shadow-none"
+                        disabled={loading}
+                        type="submit"
+                      >
                         Publish
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>

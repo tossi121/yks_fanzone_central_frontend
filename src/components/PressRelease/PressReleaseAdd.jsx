@@ -88,7 +88,7 @@ function PressReleaseAdd() {
 
   const handleUpload = async (file, setFile) => {
     try {
-      const folderName = setFile === setThumbnailFile ? '/thumbnail' : '/pdf';
+      const folderName = setFile === setThumbnailFile ? 'thumbnail' : 'pdf';
       const formData = createFormData(file, folderName);
       const headers = getHeaders();
 

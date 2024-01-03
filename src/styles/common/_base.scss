@@ -192,6 +192,7 @@ select {
   background: $purple !important;
   padding: 12px 4px !important;
 
+  .react-datepicker-time__header,
   .react-datepicker__current-month {
     color: #ffff;
   }
@@ -202,6 +203,9 @@ select {
     }
   }
 }
+
+
+.react-datepicker__time-list-item--selected,
 
 .react-datepicker__day--selected {
   background-color: $purple !important;

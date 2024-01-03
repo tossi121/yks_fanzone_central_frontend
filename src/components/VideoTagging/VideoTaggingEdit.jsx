@@ -69,7 +69,7 @@ function VideoTaggingAdd({ id }) {
 
   const handleUpload = async (file, setFile) => {
     try {
-      const folderName = setFile === setThumbnailFile ? '/video_tagging' : '';
+      const folderName = setFile === setThumbnailFile ? 'video_tagging' : '';
       const formData = createFormData(file, folderName);
       const headers = getHeaders();
 

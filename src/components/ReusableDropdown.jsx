@@ -38,7 +38,7 @@ function ReusableDropdown(props) {
         className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
         id="dropdown-basic"
       >
-        <span className="text-truncate pe-3">{selectedValue}</span>
+        <span className="text-truncate pe-3">{selectedValue.replace(/[-_]/g, ' ')}</span>
       </Dropdown.Toggle>
 
       {(singleSelect && (
@@ -87,7 +87,7 @@ function ReusableDropdown(props) {
                 className="cursor_pointer"
               />
               <label htmlFor={option[displayKey]} className="ms-3 cursor_pointer user-select-none w-100">
-                {option[displayKey]}
+                {option[displayKey].replace(/[-_]/g, ' ')}
               </label>
             </div>
           ))}

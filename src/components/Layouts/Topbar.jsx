@@ -42,7 +42,7 @@ function Topbar() {
                   <Dropdown className="slate_gray">
                     <Dropdown.Toggle
                       variant="none"
-                      className="p-0 border-0 d-flex align-items-center"
+                      className="p-0 border-0 d-flex align-items-center shadow-none"
                       id="dropdown-basic"
                     >
                       <Image src={'/images/user.png'} alt="image" height={40} width={40} className="rounded-circle" />

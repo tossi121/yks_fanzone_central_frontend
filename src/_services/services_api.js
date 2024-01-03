@@ -362,3 +362,32 @@ export async function updateVideoTagging(id, params) {
     return null;
   }
 }
+
+// CustomTags
+
+export async function getCustomTagsList(params) {
+  try {
+    const response = await fetcher('GET', process.env.TAGS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function addCustomTags(params) {
+  try {
+    const response = await fetcher('POST', process.env.TAGS_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function deleteCustomTags(params) {
+  try {
+    const response = await fetcher('POST', process.env.TAGS_DELETE_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}

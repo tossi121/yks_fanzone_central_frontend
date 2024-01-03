@@ -9,6 +9,7 @@ import {
   faNewspaper,
   faNoteSticky,
   faPhotoFilm,
+  faTags,
   faUser,
   faUserFriends,
   faVideo,
@@ -23,6 +24,7 @@ const links = [
   { href: '/articles', tokenKey: 'manage_articles', label: 'Articles', iconSrc: faNoteSticky },
   { href: '/photo-tagging', tokenKey: 'manage_photoTagging', label: 'Photo Tagging', iconSrc: faPhotoFilm },
   { href: '/video-tagging', tokenKey: 'manage_videoTagging', label: 'Video Tagging', iconSrc: faVideo },
+  { href: '/custom-tags', tokenKey: 'manage_videoTagging', label: 'Custom Tags', iconSrc: faTags },
 ];
 
 function SidebarLink({ href, label, iconSrc, tokenKey }) {

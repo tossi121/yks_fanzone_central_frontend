@@ -111,7 +111,7 @@ function ArticlesEdit({ id }) {
 
   const handleUpload = async (file, setFile) => {
     try {
-      const folderName = setFile === setThumbnailFile ? '/articles' : '/';
+      const folderName = setFile === setThumbnailFile ? 'articles' : '/';
       const formData = createFormData(file, folderName);
       const headers = getHeaders();
 
@@ -385,6 +385,7 @@ function ArticlesEdit({ id }) {
                             onChange={(value) => setPageContent(value)}
                             apiKey={process.env.TINYMCE_API_KEY}
                             init={{
+                              menubar: false,
                               plugins:
                                 'anchor autolink charmap image link lists media searchreplace table visualblocks forecolor backcolor',
                               toolbar:

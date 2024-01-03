@@ -61,7 +61,7 @@ function GalleryAdd() {
 
   const handleUpload = async (files, setFiles, existingFiles = []) => {
     try {
-      const folderName = Array.isArray(files) ? '/gallery_images' : '/gallery_thumbnail';
+      const folderName = Array.isArray(files) ? 'gallery_images' : 'gallery_thumbnail';
       const formData = createFormData(files, folderName, existingFiles);
       const headers = getHeaders();
 

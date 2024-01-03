@@ -37,7 +37,7 @@ function Articles() {
     { heading: 'Image', field: 'imageUrl' },
     { heading: 'Title', field: 'title' },
     { heading: 'Articles Type', field: 'articles_type' },
-    // { heading: 'Tags', field: 'tags' },
+    { heading: 'Created By', field: 'created_by' },
     // { heading: 'Content', field: 'content' },
     // { heading: 'Schedule', field: 'schedule' },
     { heading: 'Status', field: 'status' },
@@ -54,7 +54,6 @@ function Articles() {
         action: renderActions,
         schedule: renderDate,
         imageUrl: renderThumbnailImage,
-        articles_type: renderArticle,
         content: renderContent,
         status: renderSatus,
       },
@@ -93,10 +92,6 @@ function Articles() {
 
   function renderDate(value, row) {
     return <span className="text-nowrap">{moment(row.schedule).format('DD MMMM YYYY')} </span>;
-  }
-
-  function renderArticle(value, row) {
-    return <span>{row.articles_type?.join(', ')} </span>;
   }
 
   const handleArticlesList = async () => {

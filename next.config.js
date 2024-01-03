@@ -54,12 +54,16 @@ const nextConfig = {
     ARTICLES_DATA: 'admin/articles',
     ARTICLES_DELETE_DATA: 'admin/articlesDelete',
     ARTICLES_UPDATE_DATA: 'admin/articlesUpdate',
-    
+
     //videoTagging
     VIDEO_TAGGINGS_DATA: 'admin/videoTaggings',
     VIDEO_TAGGINGS_ADD_DATA: 'admin/videoTagging',
     VIDEO_TAGGINGS_DELETE_DATA: 'admin/videoTaggingsDelete',
     VIDEO_TAGGINGS_UPDATE_DATA: 'admin/videoTaggingsUpdate',
+
+    // tags
+    TAGS_DATA: 'admin/customTags',
+    TAGS_DELETE_DATA: 'admin/deleteTags',
   },
 };
 
