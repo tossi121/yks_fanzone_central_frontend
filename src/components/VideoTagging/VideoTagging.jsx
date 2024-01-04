@@ -76,9 +76,16 @@ function VideoTagging() {
   function renderThumbnailImage(value, row) {
     return (
       <>
-        {(row.thumbnailsUrl && (
-          <Image src={process.env.IMAGE_BASE + row.thumbnailsUrl} width={50} height={50} alt="thumbnailImage" />
-        )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={25} height={25} />}
+        <Image
+          src={
+            (row.thumbnailsUrl.includes('video_tagging') && process.env.IMAGE_BASE + row.thumbnailsUrl) ||
+            row.thumbnailsUrl
+          }
+          alt="thumbnail"
+          height={50}
+          width={50}
+          className="rounded-3 mb-2"
+        />
       </>
     );
   }
