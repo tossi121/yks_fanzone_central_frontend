@@ -1,5 +1,5 @@
 import { addArticles, getCustomTagsList } from '@/_services/services_api';
-import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faImage, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Container, Dropdown, Form, Row, Spinner } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 import ReactDatePicker from 'react-datepicker';
 import toast from 'react-hot-toast';
@@ -16,7 +16,6 @@ import { Editor } from '@tinymce/tinymce-react';
 import dynamic from 'next/dynamic';
 
 const CustomTagsAdd = dynamic(import('../CustomTags/CustomTagsAdd'));
-const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
 function ArticlesAdd() {
   const [formValues, setFormValues] = useState({
@@ -32,8 +31,9 @@ function ArticlesAdd() {
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [pageContent, setPageContent] = useState('');
   const [tagsData, setTagsData] = useState([]);
-  const [selectedTags, setSelectedTags] = useState('');
+  const [searchValue, setSearchValue] = useState('');
   const [show, setShow] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
 
   const router = useRouter();
 
@@ -61,7 +61,7 @@ function ArticlesAdd() {
         title: formValues.title,
         imageUrl: thumbnailFile,
         articles_type: formValues.articleType,
-        tags: selectedTags.map((i) => i.tag),
+        tags: selectedTags.map((i) => i.name),
         content: pageContent.level?.content,
         schedule: moment(scheduleDate).format('YYYY-MM-DD HH:mm:ss'),
         status: formValues.status,
@@ -180,6 +180,20 @@ function ArticlesAdd() {
 
     return currentDate.getTime() < selectedDate.getTime();
   };
+
+  const handleSearchChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleCheckboxChange = (tagId, tagName) => {
+    if (selectedTags.some((tag) => tag.id === tagId)) {
+      setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
+    } else {
+      setSelectedTags([...selectedTags, { id: tagId, name: tagName }]);
+    }
+  };
+
+  const filteredOptions = tagsData.filter((option) => option.tag.toLowerCase().includes(searchValue.toLowerCase()));
 
   return (
     <>
@@ -369,18 +383,53 @@ function ArticlesAdd() {
                     <Col lg={6}>
                       <Form.Group>
                         <Form.Label className="blue_dark fw-medium">Select Tags</Form.Label>
-                        {(tagsData && (
-                          <ReusableDropdown
-                            options={tagsData}
-                            selectedValueData={selectedTags}
-                            onSelect={setSelectedTags}
-                            placeholder="Tags"
-                            displayKey="tag"
-                            tagSelect={true}
-                            setShow={setShow}
-                          />
-                        )) ||
-                          ''}
+                        <Dropdown className="w-100 rounded-1">
+                          <Dropdown.Toggle
+                            variant="none"
+                            className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                            id="dropdown-basic"
+                          >
+                            <span className="text-truncate pe-3">
+                              {selectedTags.length > 0 ? selectedTags.map((tag) => tag.name).join(', ') : 'Select Tags'}
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="w-100 overflow-auto dropdown_height">
+                            <div className="px-2 mb-2 d-flex gap-2 align-items-center">
+                              <div className="w-100">
+                                <input
+                                  type="search"
+                                  placeholder="Search Tags"
+                                  onChange={handleSearchChange}
+                                  className="form-control shadow-none fs_14 slate_gray"
+                                  value={searchValue}
+                                />
+                              </div>
+                              <div
+                                className="common_btn text-white h-100 p-1 px-2 rounded-2 cursor_pointer text-nowrap"
+                                onClick={() => setShow(true)}
+                              >
+                                <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} />
+                              </div>
+                            </div>
+                            {filteredOptions.map((option) => (
+                              <div
+                                key={option.id}
+                                className="d-flex align-items-center user-select-none dropdown-item w-100 slate_gray"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={option.id}
+                                  onChange={() => handleCheckboxChange(option.id, option.tag)}
+                                  className="cursor_pointer"
+                                  checked={selectedTags.some((tag) => tag.id === option.id)}
+                                />
+                                <label htmlFor={option.id} className="ms-3 cursor_pointer user-select-none w-100">
+                                  {option.tag}
+                                </label>
+                              </div>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
                       </Form.Group>
                     </Col>
 

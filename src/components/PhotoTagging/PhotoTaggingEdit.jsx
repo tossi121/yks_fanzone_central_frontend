@@ -5,8 +5,9 @@ import {
   currentPhotoTagging,
   getPlayerProfileList,
   getTeamList,
+  getCustomTagsList,
 } from '@/_services/services_api';
-import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faImage, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -15,15 +16,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Container, Dropdown, Form, Row, Spinner } from 'react-bootstrap';
 import toast from 'react-hot-toast';
+import CustomTagsAdd from '../CustomTags/CustomTagsAdd';
 
 const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
 function PhotoTaggingEdit({ id }) {
   const photoTaggingId = id;
   const [formValues, setFormValues] = useState({
-    otherTags: [],
     status: 'Active',
   });
   const [formErrors, setFormErrors] = useState({});
@@ -32,14 +33,18 @@ function PhotoTaggingEdit({ id }) {
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [selectedEdition, setSelectedEdition] = useState('');
   const [editionData, setEditionData] = useState([]);
-  const [selectedPlayer, setSelectedPlayer] = useState('');
+  const [selectedPlayer, setSelectedPlayer] = useState([]);
   const [playerData, setPlayerData] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState('');
+  const [selectedTeam, setSelectedTeam] = useState([]);
   const [teamData, setTeamData] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState('');
   const [matchData, setMatchData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPhotoData, setCurrentPhotoData] = useState(null);
+  const [tagsData, setTagsData] = useState([]);
+  const [searchValue, setSearchValue] = useState('');
+  const [show, setShow] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -119,21 +124,30 @@ function PhotoTaggingEdit({ id }) {
       handleTeamList();
       handleMatchList();
       handleCurrentPhotoTag();
+      handleTagsList();
     }
   }, [photoTaggingId]);
+
+  const handleTagsList = async (e) => {
+    setLoading(true);
+    const res = await getCustomTagsList();
+    if (res?.status) {
+      const data = res.data;
+      setTagsData(data);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (photoTaggingId) {
       const values = {
-        otherTags: currentPhotoData?.customTags || [],
         status: currentPhotoData?.status || '',
       };
       setFormValues(values);
       setThumbnailFile(currentPhotoData?.imageUrl);
-      const playersWithNames = currentPhotoData?.players.map((name) => ({ name }));
-      const teamWithNames = currentPhotoData?.teams.map((teamName) => ({ teamName }));
-      setSelectedPlayer(playersWithNames);
-      setSelectedTeam(teamWithNames);
+      setSelectedTags(currentPhotoData?.customTags);
+      setSelectedPlayer(currentPhotoData?.players);
+      setSelectedTeam(currentPhotoData?.teams);
     }
   }, [photoTaggingId, currentPhotoData]);
 
@@ -188,9 +202,9 @@ function PhotoTaggingEdit({ id }) {
         imageUrl: thumbnailFile,
         edition: (selectedEdition == '' && currentPhotoData?.edition) || [selectedEdition.name],
         matches: (selectedMatch == '' && currentPhotoData?.matches) || [selectedMatch.matchnumber],
-        players: selectedPlayer.map((i) => i.name),
-        teams: selectedTeam.map((i) => i.teamName),
-        customTags: (formValues.otherTags.length == 0 && []) || [formValues.otherTags],
+        players: selectedPlayer.map((i) => i),
+        teams: selectedTeam.map((i) => i),
+        customTags: selectedTags.map((i) => i),
         status: formValues.status,
       };
 
@@ -229,8 +243,65 @@ function PhotoTaggingEdit({ id }) {
     return errors;
   };
 
+  const handleSearchChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleCheckboxChange = (tagName) => {
+    const isTagSelected = selectedTags.includes(tagName);
+
+    if (isTagSelected) {
+      const updatedTags = selectedTags.filter((tag) => tag !== tagName);
+      setSelectedTags(updatedTags);
+    } else {
+      setSelectedTags((prevTags) => [...prevTags, tagName]);
+    }
+  };
+
+  const handleCheckboxPlayer = (tagName) => {
+    const isTagSelected = selectedPlayer.includes(tagName);
+
+    if (isTagSelected) {
+      const updatedTags = selectedPlayer.filter((tag) => tag !== tagName);
+      setSelectedPlayer(updatedTags);
+    } else {
+      setSelectedPlayer((prevTags) => [...prevTags, tagName]);
+    }
+  };
+
+  const handleCheckboxTeam = (tagName) => {
+    const isTagSelected = selectedTeam.includes(tagName);
+
+    if (isTagSelected) {
+      const updatedTags = selectedTeam.filter((tag) => tag !== tagName);
+      setSelectedTeam(updatedTags);
+    } else {
+      setSelectedTeam((prevTags) => [...prevTags, tagName]);
+    }
+  };
+
+  const filterOptions = (data, searchValue, key) => {
+    return data.filter((option) => {
+      const value = option[key];
+      return value && value.toLowerCase().includes(searchValue.toLowerCase());
+    });
+  };
+
+  const filteredOptionsTeam = filterOptions(teamData, searchValue, 'teamName');
+  const filteredOptionsPlayer = filterOptions(playerData, searchValue, 'name');
+  const filteredOptions = filterOptions(tagsData, searchValue, 'tag');
+
   return (
     <>
+      {show && (
+        <CustomTagsAdd
+          {...{
+            show,
+            handleTagsList,
+            handleClose: () => setShow(false),
+          }}
+        />
+      )}
       <Container fluid>
         <Row>
           <Col>
@@ -297,33 +368,7 @@ function PhotoTaggingEdit({ id }) {
                         )}
                       </div>
                     </Col>
-                    <Col lg={6}>
-                      <Form.Label className="blue_dark fw-medium">Status</Form.Label>
-                      <div className="mb-3">
-                        <Form.Check
-                          inline
-                          className="fs_14 slate_gray"
-                          label="Active"
-                          type="radio"
-                          id="Active"
-                          value="Active"
-                          checked={formValues.status === 'Active'}
-                          onChange={handleChange}
-                          name="status"
-                        />
-                        <Form.Check
-                          inline
-                          className="fs_14 slate_gray"
-                          label="Inactive"
-                          type="radio"
-                          id="Inactive"
-                          value="Inactive"
-                          checked={formValues.status === 'Inactive'}
-                          onChange={handleChange}
-                          name="status"
-                        />
-                      </div>
-                    </Col>
+
                     <Col lg={6}>
                       <div className="mb-3">
                         <Form.Group className="position-relative">
@@ -374,76 +419,202 @@ function PhotoTaggingEdit({ id }) {
                         </Form.Group>
                       </div>
                     </Col>
+
                     <Col lg={6}>
-                      <div className="mb-3">
-                        <Form.Group className="position-relative">
-                          <Form.Label className="blue_dark fw-medium">Select Player</Form.Label>
-                          {(playerData && (
-                            <ReusableDropdown
-                              options={playerData}
-                              selectedValue={
-                                selectedPlayer?.length > 0 && Array.isArray(selectedPlayer)
-                                  ? selectedPlayer.map((i) => i.name).join(',')
-                                  : 'Select Player'
-                              }
-                              onSelect={setSelectedPlayer}
-                              placeholder="Player"
-                              displayKey="name"
-                            />
-                          )) ||
-                            ''}
-                          {formErrors.selectedPlayer && (
-                            <p className="text-danger fs_14 error-message">{formErrors.selectedPlayer}</p>
-                          )}
-                        </Form.Group>
-                      </div>
+                      <Form.Group className="mb-3">
+                        <Form.Label className="blue_dark fw-medium">Select Player</Form.Label>
+                        <Dropdown className="w-100 rounded-1">
+                          <Dropdown.Toggle
+                            variant="none"
+                            className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                            id="dropdown-basic"
+                          >
+                            <span className="text-truncate pe-3">
+                              {selectedPlayer?.length > 0
+                                ? selectedPlayer.map((tag) => tag).join(', ')
+                                : 'Select Player'}
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="w-100 overflow-auto dropdown_height">
+                            <div className="px-2 mb-2">
+                              <div className="w-100">
+                                <input
+                                  type="search"
+                                  placeholder="Search Player"
+                                  onChange={handleSearchChange}
+                                  className="form-control shadow-none fs_14 slate_gray"
+                                  value={searchValue}
+                                />
+                              </div>
+                            </div>
+                            {filteredOptionsPlayer.map((option) => (
+                              <div
+                                key={option.playerId}
+                                className="d-flex align-items-center user-select-none dropdown-item w-100 slate_gray"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={option.playerId}
+                                  className="cursor_pointer"
+                                  onChange={() => handleCheckboxPlayer(option.name)}
+                                  checked={selectedPlayer?.some((tag) =>
+                                    typeof tag === 'object' ? tag.playerId === option.playerId : tag === option.name
+                                  )}
+                                />
+                                <label htmlFor={option.playerId} className="ms-3 cursor_pointer user-select-none w-100">
+                                  {option.name}
+                                </label>
+                              </div>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Form.Group>
+                      {formErrors.selectedPlayer && (
+                        <p className="text-danger fs_14 error-message">{formErrors.selectedPlayer}</p>
+                      )}
+                    </Col>
+                    <Col lg={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label className="blue_dark fw-medium">Select Team</Form.Label>
+                        <Dropdown className="w-100 rounded-1">
+                          <Dropdown.Toggle
+                            variant="none"
+                            className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                            id="dropdown-basic"
+                          >
+                            <span className="text-truncate pe-3">
+                              {selectedTeam?.length > 0 ? selectedTeam.map((tag) => tag).join(', ') : 'Select Team'}
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="w-100 overflow-auto dropdown_height">
+                            <div className="px-2 mb-2">
+                              <div className="w-100">
+                                <input
+                                  type="search"
+                                  placeholder="Search Team"
+                                  onChange={handleSearchChange}
+                                  className="form-control shadow-none fs_14 slate_gray"
+                                  value={searchValue}
+                                />
+                              </div>
+                            </div>
+                            {filteredOptionsTeam.map((option) => (
+                              <div
+                                key={option.teamId}
+                                className="d-flex align-items-center user-select-none dropdown-item w-100 slate_gray"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={option.teamId}
+                                  className="cursor_pointer"
+                                  onChange={() => handleCheckboxTeam(option.teamName)}
+                                  checked={selectedTeam?.some((tag) =>
+                                    typeof tag === 'object' ? tag.id === option.teamId : tag === option.teamName
+                                  )}
+                                />
+                                <label htmlFor={option.teamId} className="ms-3 cursor_pointer user-select-none w-100">
+                                  {option.teamName}
+                                </label>
+                              </div>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Form.Group>
+                      {formErrors.selectedTeam && (
+                        <p className="text-danger fs_14 error-message">{formErrors.selectedTeam}</p>
+                      )}
                     </Col>
 
                     <Col lg={6}>
-                      <div className="mb-3">
-                        <Form.Group className="position-relative">
-                          <Form.Label className="blue_dark fw-medium">Select Team</Form.Label>
-                          {(teamData && (
-                            <ReusableDropdown
-                              options={teamData}
-                              selectedValue={
-                                selectedTeam?.length > 0 && Array.isArray(selectedTeam)
-                                  ? selectedTeam.map((i) => i.teamName).join(',')
-                                  : 'Select Team'
-                              }
-                              onSelect={setSelectedTeam}
-                              placeholder="Team"
-                              displayKey="teamName"
-                            />
-                          )) ||
-                            ''}
-                          {formErrors.selectedTeam && (
-                            <p className="text-danger fs_14 error-message">{formErrors.selectedTeam}</p>
-                          )}
-                        </Form.Group>
-                      </div>
-                    </Col>
+                      <Form.Group>
+                        <Form.Label className="blue_dark fw-medium">Select Tags</Form.Label>
+                        <Dropdown className="w-100 rounded-1">
+                          <Dropdown.Toggle
+                            variant="none"
+                            className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                            id="dropdown-basic"
+                          >
+                            <span className="text-truncate pe-3">
+                              {selectedTags?.length > 0 ? selectedTags.map((tag) => tag).join(', ') : 'Select Tags'}
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="w-100 overflow-auto dropdown_height">
+                            <div className="px-2 mb-2 d-flex gap-2 align-items-center">
+                              <div className="w-100">
+                                <input
+                                  type="search"
+                                  placeholder="Search Tags"
+                                  onChange={handleSearchChange}
+                                  className="form-control shadow-none fs_14 slate_gray"
+                                  value={searchValue}
+                                />
+                              </div>
+                              <div
+                                className="common_btn text-white h-100 p-1 px-2 rounded-2 cursor_pointer text-nowrap"
+                                onClick={() => setShow(true)}
+                              >
+                                <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} />
+                              </div>
+                            </div>
+                            {filteredOptions.map((option) => (
+                              <div
+                                key={option.id}
+                                className="d-flex align-items-center user-select-none dropdown-item w-100 slate_gray"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={option.id}
+                                  onChange={() => handleCheckboxChange(option.tag)}
+                                  className="cursor_pointer"
+                                  checked={selectedTags?.some((tag) =>
+                                    typeof tag === 'object' ? tag.id === option.id : tag === option.tag
+                                  )}
+                                />
 
+                                <label htmlFor={option.id} className="ms-3 cursor_pointer user-select-none w-100">
+                                  {option.tag}
+                                </label>
+                              </div>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Form.Group>
+                    </Col>
                     <Col lg={6}>
+                      <Form.Label className="blue_dark fw-medium">Status</Form.Label>
                       <div className="mb-3">
-                        <Form.Group>
-                          <Form.Label className="blue_dark fw-medium">Enter Other Tags</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            name="otherTags"
-                            value={formValues.otherTags}
-                            onChange={handleChange}
-                            className="shadow-none fs_14 slate_gray textarea_description"
-                            placeholder="Enter other tags"
-                          />
-                          {formErrors.otherTags && <p className="text-danger fs_13 mt-1">{formErrors.otherTags}</p>}
-                        </Form.Group>
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Active"
+                          type="radio"
+                          id="Active"
+                          value="Active"
+                          checked={formValues.status === 'Active'}
+                          onChange={handleChange}
+                          name="status"
+                        />
+                        <Form.Check
+                          inline
+                          className="fs_14 slate_gray"
+                          label="Inactive"
+                          type="radio"
+                          id="Inactive"
+                          value="Inactive"
+                          checked={formValues.status === 'Inactive'}
+                          onChange={handleChange}
+                          name="status"
+                        />
                       </div>
                     </Col>
-
                     <Col lg={12}>
-                      <Button variant="" className="px-4 text-white common_btn shadow-none" disabled={loading} type="submit">
-                       Update
+                      <Button
+                        variant=""
+                        className="px-4 text-white common_btn shadow-none"
+                        disabled={loading}
+                        type="submit"
+                      >
+                        Update
                         {loading && <Spinner animation="border" variant="white" size="sm" className="ms-1 spinner" />}
                       </Button>
                     </Col>

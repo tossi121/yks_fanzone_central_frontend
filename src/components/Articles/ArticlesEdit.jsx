@@ -1,5 +1,5 @@
 import { updateArticles, currentArticles, getCustomTagsList } from '@/_services/services_api';
-import { faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faImage, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -8,16 +8,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Container, Dropdown, Form, Row, Spinner } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 import ReactDatePicker from 'react-datepicker';
 import toast from 'react-hot-toast';
 import { Editor } from '@tinymce/tinymce-react';
 import dynamic from 'next/dynamic';
-import CustomMultiSelectDropdown from '../CustomMultiSelectDropdown';
 
 const CustomTagsAdd = dynamic(import('../CustomTags/CustomTagsAdd'));
-const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
 function ArticlesEdit({ id }) {
   const articlesId = id;
@@ -35,8 +33,9 @@ function ArticlesEdit({ id }) {
   const [pageContent, setPageContent] = useState('');
   const [currentArticlesData, setCurrentArticlesData] = useState(null);
   const [tagsData, setTagsData] = useState([]);
-  const [selectedTags, setSelectedTags] = useState('');
+  const [searchValue, setSearchValue] = useState('');
   const [show, setShow] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
 
   const router = useRouter();
 
@@ -73,7 +72,6 @@ function ArticlesEdit({ id }) {
         articleType: currentArticlesData?.articles_type || '',
       };
       setFormValues(values);
-      // const articleWithNames = currentArticlesData?.tags.map((tags) => ({ tags }));
       setSelectedTags(currentArticlesData?.tags);
       const date = new Date(currentArticlesData?.schedule || '');
       if (!isNaN(date.getTime())) {
@@ -86,6 +84,7 @@ function ArticlesEdit({ id }) {
     }
   }, [articlesId, currentArticlesData]);
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = formValidation(formValues);
@@ -96,7 +95,7 @@ function ArticlesEdit({ id }) {
         title: formValues.title,
         imageUrl: thumbnailFile,
         articles_type: formValues.articleType,
-        tags: selectedTags.map((i) => i.tag),
+        tags: selectedTags.map((i) => i),
         content: pageContent.level?.content,
         schedule: moment(scheduleDate).format('YYYY-MM-DD HH:mm:ss'),
         status: formValues.status,
@@ -215,19 +214,22 @@ function ArticlesEdit({ id }) {
     return currentDate.getTime() < selectedDate.getTime();
   };
 
-  const [selectedEducation, setSelectedEducation] = useState([]);
-  const [selectedEducationId, setSelectedEducationId] = useState([]);
+  const handleSearchChange = (e) => {
+    setSearchValue(e.target.value);
+  };
 
+  const handleCheckboxChange = (tagName) => {
+    const isTagSelected = selectedTags.includes(tagName);
 
-  const handleSelectedItems = (id, name) => {
-    if (!selectedEducationId.includes(id)) {
-      setSelectedEducation([...selectedEducation, name]);
-      setSelectedEducationId([...selectedEducationId, id]);
+    if (isTagSelected) {
+      const updatedTags = selectedTags.filter((tag) => tag !== tagName);
+      setSelectedTags(updatedTags);
     } else {
-      setSelectedEducation(selectedEducation.filter((tag) => tag !== name));
-      setSelectedEducationId(selectedEducationId.filter((tagId) => tagId !== id));
+      setSelectedTags((prevTags) => [...prevTags, tagName]);
     }
   };
+
+  const filteredOptions = tagsData.filter((option) => option.tag.toLowerCase().includes(searchValue.toLowerCase()));
 
   return (
     <>
@@ -413,32 +415,61 @@ function ArticlesEdit({ id }) {
                         )}
                       </div>
                     </Col>
-
-                    {/* <Col lg={6}>
+                    <Col lg={6}>
                       <Form.Group>
                         <Form.Label className="blue_dark fw-medium">Select Tags</Form.Label>
-                        {tagsData && (
-                          <ReusableDropdown
-                            options={tagsData}
-                            selectedValueData={selectedTags.length > 0 && selectedTags}
-                            onSelect={setSelectedTags}
-                            placeholder="Tags"
-                            displayKey="tag"
-                            tagSelect={true}
-                            setShow={setShow}
-                          />
-                        )}
+                        <Dropdown className="w-100 rounded-1">
+                          <Dropdown.Toggle
+                            variant="none"
+                            className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                            id="dropdown-basic"
+                          >
+                            <span className="text-truncate pe-3">
+                              {selectedTags?.length > 0 ? selectedTags.map((tag) => tag).join(', ') : 'Select Tags'}
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="w-100 overflow-auto dropdown_height">
+                            <div className="px-2 mb-2 d-flex gap-2 align-items-center">
+                              <div className="w-100">
+                                <input
+                                  type="search"
+                                  placeholder="Search Tags"
+                                  onChange={handleSearchChange}
+                                  className="form-control shadow-none fs_14 slate_gray"
+                                  value={searchValue}
+                                />
+                              </div>
+                              <div
+                                className="common_btn text-white h-100 p-1 px-2 rounded-2 cursor_pointer text-nowrap"
+                                onClick={() => setShow(true)}
+                              >
+                                <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} />
+                              </div>
+                            </div>
+                            {filteredOptions.map((option) => (
+                              <div
+                                key={option.id}
+                                className="d-flex align-items-center user-select-none dropdown-item w-100 slate_gray"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={option.id}
+                                  onChange={() => handleCheckboxChange(option.tag)}
+                                  className="cursor_pointer"
+                                  checked={selectedTags?.some((tag) =>
+                                    typeof tag === 'object' ? tag.id === option.id : tag === option.tag
+                                  )}
+                                />
+
+                                <label htmlFor={option.id} className="ms-3 cursor_pointer user-select-none w-100">
+                                  {option.tag}
+                                </label>
+                              </div>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
                       </Form.Group>
-                    </Col> */}
-{console.log(tagsData, 'tagsData')}
-                    <CustomMultiSelectDropdown
-                      placeholder="Select category"
-                      items={tagsData || []}
-                      selectedItems={selectedEducation}
-                      onItemToggle={handleSelectedItems}
-                      searchBy={true}
-                      selectedItemsId={selectedEducationId}
-                    />
+                    </Col>
 
                     <Col lg={12}>
                       <div className="mb-3">

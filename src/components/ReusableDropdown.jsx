@@ -36,10 +36,8 @@ function ReusableDropdown(props) {
 
   const handleCheckboxChange = (id) => {
     onSelect((prevSelected) => {
-      console.log('prevSelected:', prevSelected);
 
       const isSelected = Array.isArray(prevSelected) && prevSelected.some((item) => item.id === id);
-      console.log('isSelected:', isSelected);
 
       if (isSelected) {
         return prevSelected.filter((item) => item.id !== id);
@@ -49,8 +47,6 @@ function ReusableDropdown(props) {
       }
     });
   };
-
-  console.log(selectedValueData, '2212112');
 
   useEffect(() => {
     if (Array.isArray(selectedValueData)) {
@@ -129,7 +125,6 @@ function ReusableDropdown(props) {
                 onChange={() => handleCheckboxChange(option.id)}
                 className="cursor_pointer"
               />
-              {console.log(option)}
               <label htmlFor={option[displayKey]} className="ms-3 cursor_pointer user-select-none w-100">
                 {option[displayKey].replace(/[-_]/g, ' ')}
               </label>
