@@ -391,3 +391,21 @@ export async function deleteCustomTags(params) {
     return null;
   }
 }
+
+export async function getCatagoryList(params) {
+  try {
+    const response = await fetcher('GET', process.env.VIDEO_CATAGORY_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function addCatagory(params) {
+  try {
+    const response = await fetcher('POST', process.env.VIDEO_CATAGORY_DATA, params);
+    return response;
+  } catch (err) {
+    return null;
+  }
+}

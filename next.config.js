@@ -60,6 +60,7 @@ const nextConfig = {
     VIDEO_TAGGINGS_ADD_DATA: 'admin/videoTagging',
     VIDEO_TAGGINGS_DELETE_DATA: 'admin/videoTaggingsDelete',
     VIDEO_TAGGINGS_UPDATE_DATA: 'admin/videoTaggingsUpdate',
+    VIDEO_CATAGORY_DATA: 'admin/videoCatagory',
 
     // tags
     TAGS_DATA: 'admin/customTags',

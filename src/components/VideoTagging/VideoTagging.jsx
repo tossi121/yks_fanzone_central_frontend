@@ -32,9 +32,10 @@ function VideoTagging() {
 
   const columns = [
     { heading: 'Id', field: 'serialNumber' },
+    { heading: 'Thumbnail', field: 'thumbnailsUrl' },
     { heading: 'Edition', field: 'edition' },
-    { heading: 'Players', field: 'players' },
-    { heading: 'Teams', field: 'teams' },
+    // { heading: 'Players', field: 'players' },
+    // { heading: 'Teams', field: 'teams' },
     { heading: 'Matches', field: 'matches' },
     // { heading: 'Categories', field: 'categories' },
     // { heading: 'Other Tags', field: 'customTags' },
@@ -45,6 +46,7 @@ function VideoTagging() {
   const options = {
     columns: {
       render: {
+        thumbnailsUrl: renderThumbnailImage,
         edition: renderEdition,
         players: renderPlayers,
         teams: renderTeams,
@@ -71,6 +73,15 @@ function VideoTagging() {
     return <>{(row.customTags?.length > 0 && <span>{row.customTags?.join(', ')} </span>) || 'N/A'}</>;
   }
 
+  function renderThumbnailImage(value, row) {
+    return (
+      <>
+        {(row.thumbnailsUrl && (
+          <Image src={process.env.IMAGE_BASE + row.thumbnailsUrl} width={50} height={50} alt="thumbnailImage" />
+        )) || <FontAwesomeIcon icon={faImage} className="slate_gray mb-3" width={25} height={25} />}
+      </>
+    );
+  }
 
   function renderActions(value, row) {
     const handleDeleteModal = () => {

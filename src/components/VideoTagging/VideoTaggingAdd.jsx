@@ -1,6 +1,7 @@
 import {
   addVideoTaggings,
   geTournamentList,
+  getCatagoryList,
   getCustomTagsList,
   getMatchList,
   getPlayerProfileList,
@@ -18,6 +19,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Dropdown, Form, Row, Spinner } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import CustomTagsAdd from '../CustomTags/CustomTagsAdd';
+import VideoCatagoryAdd from './VideoCatagoryAdd';
 
 const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
@@ -25,7 +27,6 @@ function VideoTaggingAdd() {
   const [formValues, setFormValues] = useState({
     url: '',
     title: '',
-    otherTags: [],
     status: 'Active',
   });
   const [formErrors, setFormErrors] = useState({});
@@ -42,11 +43,13 @@ function VideoTaggingAdd() {
   const [matchData, setMatchData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [videoDetails, setVideoDetails] = useState(null);
-  const [categories, setCategories] = useState(['']);
   const [searchValue, setSearchValue] = useState('');
   const [show, setShow] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagsData, setTagsData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [showVideo, setShowVideo] = useState(false);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -57,7 +60,18 @@ function VideoTaggingAdd() {
 
   useEffect(() => {
     handleTagsList();
+    handleCatagoryList();
   }, []);
+
+  const handleCatagoryList = async (e) => {
+    setLoading(true);
+    const res = await getCatagoryList();
+    if (res?.status) {
+      const data = res.data;
+      setCategoryData(data);
+    }
+    setLoading(false);
+  };
 
   const handleTagsList = async (e) => {
     setLoading(true);
@@ -186,8 +200,8 @@ function VideoTaggingAdd() {
         players: selectedPlayer.map((i) => i.name),
         teams: selectedTeam.map((i) => i.name),
         customTags: selectedTags.map((i) => i.name),
+        categories: selectedCategory.map((i) => i.name),
         status: formValues.status,
-        categories: categories,
       };
 
       const res = await addVideoTaggings(params);
@@ -209,9 +223,6 @@ function VideoTaggingAdd() {
     if (!values.url) {
       errors.url = 'Please enter url';
     }
-    if (!categories || categories.some((category) => category.trim() === '')) {
-      errors.categories = 'Please enter category';
-    }
 
     if (!thumbnailFile) {
       errors.thumbnailFile = 'Please upload thumbnail';
@@ -219,6 +230,9 @@ function VideoTaggingAdd() {
 
     if (!selectedEdition) {
       errors.selectedEdition = 'Please select edition';
+    }
+    if (selectedCategory.length == 0) {
+      errors.selectedCategory = 'Please select category';
     }
     if (selectedPlayer.length == 0) {
       errors.selectedPlayer = 'Please select player';
@@ -264,23 +278,12 @@ function VideoTaggingAdd() {
         title: videoDetails?.title,
         url: formValues.url,
         status: 'Active',
-        otherTags: formValues.otherTags,
       };
       setFormValues(values);
       const thumbnailUrl = videoDetails?.thumbnails?.standard?.url;
       setThumbnailFile(thumbnailUrl);
     }
   }, [videoDetails]);
-
-  const handleAddCategory = () => {
-    setCategories([...categories, '']);
-  };
-
-  const handleDeleteCategory = (index) => {
-    const updatedCategories = [...categories];
-    updatedCategories.splice(index, 1);
-    setCategories(updatedCategories);
-  };
 
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
@@ -315,8 +318,21 @@ function VideoTaggingAdd() {
       setSelectedTeam([...selectedTeam, { id: tagId, name: tagName }]);
     }
   };
+
   const filteredOptionsTeam = teamData.filter((option) =>
     option.teamName.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  const handleCheckboxCategory = (tagId, tagName) => {
+    if (selectedCategory.some((tag) => tag.id === tagId)) {
+      setSelectedCategory(selectedCategory.filter((tag) => tag.id !== tagId));
+    } else {
+      setSelectedCategory([...selectedCategory, { id: tagId, name: tagName }]);
+    }
+  };
+
+  const filteredOptionsCategory = categoryData.filter((option) =>
+    option.tag.toLowerCase().includes(searchValue.toLowerCase())
   );
 
   return (
@@ -327,6 +343,15 @@ function VideoTaggingAdd() {
             show,
             handleTagsList,
             handleClose: () => setShow(false),
+          }}
+        />
+      )}
+      {showVideo && (
+        <VideoCatagoryAdd
+          {...{
+            showVideo,
+            handleCatagoryList,
+            handleClose: () => setShowVideo(false),
           }}
         />
       )}
@@ -552,10 +577,10 @@ function VideoTaggingAdd() {
                             ))}
                           </Dropdown.Menu>
                         </Dropdown>
-                      </Form.Group>
                       {formErrors.selectedPlayer && (
                         <p className="text-danger fs_14 error-message">{formErrors.selectedPlayer}</p>
                       )}
+                      </Form.Group>
                     </Col>
                     <Col lg={6}>
                       <Form.Group className="mb-3">
@@ -602,10 +627,10 @@ function VideoTaggingAdd() {
                             ))}
                           </Dropdown.Menu>
                         </Dropdown>
-                      </Form.Group>
                       {formErrors.selectedTeam && (
                         <p className="text-danger fs_14 error-message">{formErrors.selectedTeam}</p>
                       )}
+                      </Form.Group>
                     </Col>
 
                     <Col lg={6}>
@@ -662,43 +687,61 @@ function VideoTaggingAdd() {
                     </Col>
 
                     <Col lg={6}>
-                      <Form.Label className="blue_dark fw-medium">Enter Categories</Form.Label>
-                      {categories.map((category, index) => (
-                        <>
-                          <Form.Group className="d-flex align-items-center gap-3 mb-3 w-100" key={index}>
-                            <Form.Control
-                              type="text"
-                              placeholder="Enter Category"
-                              value={category}
-                              onChange={(e) => {
-                                const updatedCategories = [...categories];
-                                updatedCategories[index] = e.target.value;
-                                setCategories(updatedCategories);
-                              }}
-                              className="shadow-none fs_14 slate_gray"
-                            />
-
-                            {(index > 0 && (
-                              <Button
-                                variant="danger"
-                                className="p-0 category_btn shadow-none"
-                                onClick={() => handleDeleteCategory(index)}
+                      <Form.Group className="mb-3">
+                        <Form.Label className="blue_dark fw-medium">Select Category</Form.Label>
+                        <Dropdown className="w-100 rounded-1">
+                          <Dropdown.Toggle
+                            variant="none"
+                            className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                            id="dropdown-basic"
+                          >
+                            <span className="text-truncate pe-3">
+                              {selectedCategory.length > 0
+                                ? selectedCategory.map((tag) => tag.name).join(', ')
+                                : 'Select Category'}
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="w-100 overflow-auto dropdown_height">
+                            <div className="px-2 mb-2 d-flex gap-2 align-items-center">
+                              <div className="w-100">
+                                <input
+                                  type="search"
+                                  placeholder="Search Category"
+                                  onChange={handleSearchChange}
+                                  className="form-control shadow-none fs_14 slate_gray"
+                                  value={searchValue}
+                                />
+                              </div>
+                              <div
+                                className="common_btn text-white h-100 p-1 px-2 rounded-2 cursor_pointer text-nowrap"
+                                onClick={() => setShowVideo(true)}
                               >
-                                <FontAwesomeIcon icon={faTrash} width={15} height={15} />
-                              </Button>
-                            )) || (
-                              <Button
-                                variant=""
-                                className="p-0 text-white common_btn category_btn shadow-none"
-                                onClick={handleAddCategory}
+                                <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} />
+                              </div>
+                            </div>
+                            {filteredOptionsCategory.map((option) => (
+                              <div
+                                key={option.id}
+                                className="d-flex align-items-center user-select-none dropdown-item w-100 slate_gray"
                               >
-                                <FontAwesomeIcon icon={faPlus} width={15} height={15} />
-                              </Button>
-                            )}
-                          </Form.Group>
-                        </>
-                      ))}
-                      {formErrors.categories && <p className="text-danger fs_13">{formErrors.categories}</p>}
+                                <input
+                                  type="checkbox"
+                                  id={option.id}
+                                  onChange={() => handleCheckboxCategory(option.id, option.tag)}
+                                  className="cursor_pointer"
+                                  checked={selectedCategory.some((tag) => tag.id === option.id)}
+                                />
+                                <label htmlFor={option.id} className="ms-3 cursor_pointer user-select-none w-100">
+                                  {option.tag}
+                                </label>
+                              </div>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                        {formErrors.selectedCategory && (
+                          <p className="text-danger fs_14 error-message">{formErrors.selectedCategory}</p>
+                        )}
+                      </Form.Group>
                     </Col>
 
                     <Col lg={12}>

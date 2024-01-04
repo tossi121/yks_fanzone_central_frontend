@@ -2,6 +2,7 @@ import {
   addVideoTaggings,
   currentVideoTagging,
   geTournamentList,
+  getCatagoryList,
   getCustomTagsList,
   getMatchList,
   getPlayerProfileList,
@@ -20,6 +21,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Dropdown, Form, Row, Spinner } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import CustomTagsAdd from '../CustomTags/CustomTagsAdd';
+import VideoCatagoryAdd from './VideoCatagoryAdd';
 
 const ReusableDropdown = dynamic(import('../ReusableDropdown'));
 
@@ -44,12 +46,14 @@ function VideoTaggingAdd({ id }) {
   const [matchData, setMatchData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [videoDetails, setVideoDetails] = useState(null);
-  const [categories, setCategories] = useState(['']);
   const [currentVideoData, setCurrentVideoData] = useState(null);
   const [tagsData, setTagsData] = useState([]);
   const [searchValue, setSearchValue] = useState('');
   const [show, setShow] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [showVideo, setShowVideo] = useState(false);
 
   const router = useRouter();
 
@@ -131,8 +135,19 @@ function VideoTaggingAdd({ id }) {
       handleMatchList();
       handleCurrentVideoTag();
       handleTagsList();
+      handleCatagoryList();
     }
   }, [videoTaggingId]);
+
+  const handleCatagoryList = async (e) => {
+    setLoading(true);
+    const res = await getCatagoryList();
+    if (res?.status) {
+      const data = res.data;
+      setCategoryData(data);
+    }
+    setLoading(false);
+  };
 
   const handleTagsList = async (e) => {
     setLoading(true);
@@ -156,7 +171,7 @@ function VideoTaggingAdd({ id }) {
       setSelectedTags(currentVideoData?.customTags);
       setSelectedPlayer(currentVideoData?.players);
       setSelectedTeam(currentVideoData?.teams);
-      setCategories(currentVideoData?.categories);
+      setSelectedCategory(currentVideoData?.categories);
     }
   }, [videoTaggingId, currentVideoData]);
 
@@ -215,8 +230,8 @@ function VideoTaggingAdd({ id }) {
         players: selectedPlayer.map((i) => i),
         teams: selectedTeam.map((i) => i),
         customTags: selectedTags.map((i) => i),
+        categories: selectedCategory.map((i) => i),
         status: formValues.status,
-        categories: categories,
       };
 
       const res = await updateVideoTagging(videoTaggingId, params);
@@ -238,8 +253,8 @@ function VideoTaggingAdd({ id }) {
     if (!values.url) {
       errors.url = 'Please enter url';
     }
-    if (!categories || categories.some((category) => category.trim() === '')) {
-      errors.categories = 'Please enter category';
+    if (selectedCategory.length == 0) {
+      errors.selectedCategory = 'Please select category';
     }
 
     if (!thumbnailFile) {
@@ -301,16 +316,6 @@ function VideoTaggingAdd({ id }) {
     }
   }, [videoDetails]);
 
-  const handleAddCategory = () => {
-    setCategories([...categories, '']);
-  };
-
-  const handleDeleteCategory = (index) => {
-    const updatedCategories = [...categories];
-    updatedCategories.splice(index, 1);
-    setCategories(updatedCategories);
-  };
-
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
   };
@@ -348,6 +353,17 @@ function VideoTaggingAdd({ id }) {
     }
   };
 
+  const handleCheckboxCategory = (tagName) => {
+    const isTagSelected = selectedCategory.includes(tagName);
+
+    if (isTagSelected) {
+      const updatedTags = selectedCategory.filter((tag) => tag !== tagName);
+      setSelectedCategory(updatedTags);
+    } else {
+      setSelectedCategory((prevTags) => [...prevTags, tagName]);
+    }
+  };
+
   const filterOptions = (data, searchValue, key) => {
     return data.filter((option) => {
       const value = option[key];
@@ -358,6 +374,7 @@ function VideoTaggingAdd({ id }) {
   const filteredOptionsTeam = filterOptions(teamData, searchValue, 'teamName');
   const filteredOptionsPlayer = filterOptions(playerData, searchValue, 'name');
   const filteredOptions = filterOptions(tagsData, searchValue, 'tag');
+  const filteredOptionsCategory = filterOptions(categoryData, searchValue, 'tag');
 
   return (
     <>
@@ -367,6 +384,16 @@ function VideoTaggingAdd({ id }) {
             show,
             handleTagsList,
             handleClose: () => setShow(false),
+          }}
+        />
+      )}
+
+      {showVideo && (
+        <VideoCatagoryAdd
+          {...{
+            showVideo,
+            handleCatagoryList,
+            handleClose: () => setShowVideo(false),
           }}
         />
       )}
@@ -602,10 +629,10 @@ function VideoTaggingAdd({ id }) {
                             ))}
                           </Dropdown.Menu>
                         </Dropdown>
-                      </Form.Group>
                       {formErrors.selectedPlayer && (
                         <p className="text-danger fs_14 error-message">{formErrors.selectedPlayer}</p>
                       )}
+                      </Form.Group>
                     </Col>
                     <Col lg={6}>
                       <Form.Group className="mb-3">
@@ -653,10 +680,10 @@ function VideoTaggingAdd({ id }) {
                             ))}
                           </Dropdown.Menu>
                         </Dropdown>
-                      </Form.Group>
                       {formErrors.selectedTeam && (
                         <p className="text-danger fs_14 error-message">{formErrors.selectedTeam}</p>
                       )}
+                      </Form.Group>
                     </Col>
 
                     <Col lg={6}>
@@ -685,7 +712,7 @@ function VideoTaggingAdd({ id }) {
                               </div>
                               <div
                                 className="common_btn text-white h-100 p-1 px-2 rounded-2 cursor_pointer text-nowrap"
-                                onClick={() => setShow(true)}
+                                onClick={() => setShowVideo(true)}
                               >
                                 <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} />
                               </div>
@@ -716,44 +743,64 @@ function VideoTaggingAdd({ id }) {
                     </Col>
 
                     <Col lg={6}>
-                      <Form.Label className="blue_dark fw-medium">Enter Categories</Form.Label>
-                      {categories &&
-                        categories.map((category, index) => (
-                          <>
-                            <Form.Group className="d-flex align-items-center gap-3 mb-3 w-100" key={index}>
-                              <Form.Control
-                                type="text"
-                                placeholder="Enter Category"
-                                value={category}
-                                onChange={(e) => {
-                                  const updatedCategories = [...categories];
-                                  updatedCategories[index] = e.target.value;
-                                  setCategories(updatedCategories);
-                                }}
-                                className="shadow-none fs_14 slate_gray"
-                              />
+                      <Form.Group className="mb-3">
+                        <Form.Label className="blue_dark fw-medium">Select Category</Form.Label>
+                        <Dropdown className="w-100 rounded-1">
+                          <Dropdown.Toggle
+                            variant="none"
+                            className="fs_14 slate_gray w-100 d-flex justify-content-between align-items-center form-control shadow-none border"
+                            id="dropdown-basic"
+                          >
+                            <span className="text-truncate pe-3">
+                              {selectedCategory?.length > 0
+                                ? selectedCategory.map((tag) => tag).join(', ')
+                                : 'Select Category'}
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="w-100 overflow-auto dropdown_height">
+                            <div className="px-2 mb-2 d-flex gap-2 align-items-center">
+                              <div className="w-100">
+                                <input
+                                  type="search"
+                                  placeholder="Search Category"
+                                  onChange={handleSearchChange}
+                                  className="form-control shadow-none fs_14 slate_gray"
+                                  value={searchValue}
+                                />
+                              </div>
+                              <div
+                                className="common_btn text-white h-100 p-1 px-2 rounded-2 cursor_pointer text-nowrap"
+                                onClick={() => setShow(true)}
+                              >
+                                <FontAwesomeIcon icon={faPlusCircle} width={16} height={16} />
+                              </div>
+                            </div>
+                            {filteredOptionsCategory.map((option) => (
+                              <div
+                                key={option.id}
+                                className="d-flex align-items-center user-select-none dropdown-item w-100 slate_gray"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={option.id}
+                                  onChange={() => handleCheckboxCategory(option.tag)}
+                                  className="cursor_pointer"
+                                  checked={selectedCategory?.some((tag) =>
+                                    typeof tag === 'object' ? tag.id === option.id : tag === option.tag
+                                  )}
+                                />
 
-                              {(index > 0 && (
-                                <Button
-                                  variant="danger"
-                                  className="p-0 category_btn shadow-none"
-                                  onClick={() => handleDeleteCategory(index)}
-                                >
-                                  <FontAwesomeIcon icon={faTrash} width={15} height={15} />
-                                </Button>
-                              )) || (
-                                <Button
-                                  variant=""
-                                  className="p-0 text-white common_btn category_btn shadow-none"
-                                  onClick={handleAddCategory}
-                                >
-                                  <FontAwesomeIcon icon={faPlus} width={15} height={15} />
-                                </Button>
-                              )}
-                            </Form.Group>
-                          </>
-                        ))}
-                      {formErrors.categories && <p className="text-danger fs_13">{formErrors.categories}</p>}
+                                <label htmlFor={option.id} className="ms-3 cursor_pointer user-select-none w-100">
+                                  {option.tag}
+                                </label>
+                              </div>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      {formErrors.selectedCategory && (
+                        <p className="text-danger fs_14 error-message">{formErrors.selectedCategory}</p>
+                      )}
+                      </Form.Group>
                     </Col>
 
                     <Col lg={12}>

@@ -468,10 +468,10 @@ function PhotoTaggingEdit({ id }) {
                             ))}
                           </Dropdown.Menu>
                         </Dropdown>
-                      </Form.Group>
                       {formErrors.selectedPlayer && (
                         <p className="text-danger fs_14 error-message">{formErrors.selectedPlayer}</p>
                       )}
+                      </Form.Group>
                     </Col>
                     <Col lg={6}>
                       <Form.Group className="mb-3">
@@ -519,10 +519,10 @@ function PhotoTaggingEdit({ id }) {
                             ))}
                           </Dropdown.Menu>
                         </Dropdown>
-                      </Form.Group>
                       {formErrors.selectedTeam && (
                         <p className="text-danger fs_14 error-message">{formErrors.selectedTeam}</p>
                       )}
+                      </Form.Group>
                     </Col>
 
                     <Col lg={6}>
