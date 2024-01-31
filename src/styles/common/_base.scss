@@ -14,7 +14,9 @@ html {
     font-size: #{$i}px;
   }
 }
-
+.tox-dialog__body-nav {
+  display: none !important;
+}
 //  input
 ::-webkit-scrollbar {
   width: 8px;
