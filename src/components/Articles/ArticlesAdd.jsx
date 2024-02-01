@@ -100,7 +100,7 @@ function ArticlesAdd() {
 
   const handleUpload = async (file, setFile) => {
     try {
-      const folderName = setFile === setThumbnailFile ? 'articles' : '/articles_content';
+      const folderName = setFile === setThumbnailFile ? 'articles' : '/';
       const formData = createFormData(file, folderName);
       const headers = getHeaders();
 
@@ -193,24 +193,7 @@ function ArticlesAdd() {
   };
 
   const filteredOptions = tagsData.filter((option) => option.tag.toLowerCase().includes(searchValue.toLowerCase()));
-  const handleImageUpload = async (blobInfo, success, failure, progress) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', blobInfo.blob(), blobInfo.filename());
-      const headers = getHeaders();
 
-      const response = await axios.post(
-        `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
-        formData,
-        { headers }
-      );
-
-      // Assuming the server responds with the image URL in the 'data' property
-      success(response.data);
-    } catch (error) {
-      failure('Image upload failed: ' + error.message);
-    }
-  };
   return (
     <>
       {show && (
@@ -463,32 +446,8 @@ function ArticlesAdd() {
                               toolbar:
                                 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | forecolor backcolor',
                               image_title: true,
-                              automatic_uploads: true,
+                              automatic_uploads: false,
                               file_picker_types: 'image',
-                              // file_picker_callback: (cb, value, meta) => {
-                              //   const input = document.createElement('input');
-                              //   input.setAttribute('type', 'file');
-                              //   input.setAttribute('accept', 'image/*');
-                              //   input.setAttribute('multiple', 'true');
-                              //   input.addEventListener('change', (e) => {
-                              //     const file = e.target.files[0];
-                              //     setAddImageFile(file);
-                              //     const reader = new FileReader();
-                              //     reader.addEventListener('load', () => {
-                              //       const id = 'blobid' + new Date().getTime();
-                              //       const blobCache = tinymce.activeEditor.editorUpload.blobCache;
-                              //       const base64 = reader.result.split(',')[1];
-                              //       const blobInfo = blobCache.create(id, file, base64);
-                              //       blobCache.add(blobInfo);
-
-                              //       cb(blobInfo.blobUri(), { title: file.name });
-                              //     });
-                              //     reader.readAsDataURL(file);
-                              //   });
-
-                              //   input.click();
-                              // },
-
                               file_picker_callback: async (cb, value, meta) => {
                                 const input = document.createElement('input');
                                 input.setAttribute('type', 'file');
@@ -496,12 +455,11 @@ function ArticlesAdd() {
                                 input.setAttribute('multiple', 'true');
                                 input.addEventListener('change', async (e) => {
                                   const file = e.target.files[0];
-                              
                                   const formData = new FormData();
-                                  formData.append('file', file);
-                              
+                                  formData.append('folderName', '/articles_content');
+                                  formData.append('files', file);
                                   const headers = getHeaders();
-                              
+
                                   try {
                                     // Upload to S3
                                     const s3Response = await axios.post(
@@ -509,42 +467,30 @@ function ArticlesAdd() {
                                       formData,
                                       { headers }
                                     );
-                              
+
                                     // Assuming S3 response contains the S3 URL
-                                    const s3ImageUrl = s3Response.data.imageUrl;
-                              
-                                    // Use S3 URL as the image source
-                                    const id = 'blobid' + new Date().getTime();
-                                    const blobCache = tinymce.activeEditor.editorUpload.blobCache;
-                                    const blobInfo = blobCache.create(id, file, s3ImageUrl);
-                                    blobCache.add(blobInfo);
-                              
+                                    const s3ImageUrl = process.env.IMAGE_BASE + s3Response.data.result[0];
+
                                     // Include file name in alt attribute
                                     const altText = file.name;
-                                    cb(blobInfo.blobUri(), { title: altText });
-                              
-                                    // Find and update the img tag in the editor content
-                                    const editorContent = tinymce.activeEditor.getContent();
-                                    const updatedContent = editorContent.replace(
-                                      new RegExp(`src=["']blob:${blobInfo.blobUri()}["']`, 'g'),
-                                      `src="${s3ImageUrl}" alt="${altText}"`
-                                    );
-                              
-                                    tinymce.activeEditor.setContent(updatedContent);
+
+                                    // Set the image directly with the S3 URL
+                                    const imgTag = `<img src="${s3ImageUrl}" alt="${altText}">`;
+
+                                    // Insert the image into the editor
+                                    tinymce.activeEditor.execCommand('mceInsertContent', false, imgTag);
+
+                                    // Invoke the callback with the S3 image URL and image title
+                                    cb(s3ImageUrl, { title: altText });
                                   } catch (error) {
                                     console.error('Error:', error);
                                   }
                                 });
-                              
+
                                 input.click();
                               },
-                              
-                              
-                              
-                              
                             }}
                           />
-
                           {formErrors.pageContent && <p className="text-danger fs_13 mt-1">{formErrors.pageContent}</p>}
                         </Form.Group>
                       </div>

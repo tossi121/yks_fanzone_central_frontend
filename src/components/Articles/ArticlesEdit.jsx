@@ -84,7 +84,6 @@ function ArticlesEdit({ id }) {
     }
   }, [articlesId, currentArticlesData]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = formValidation(formValues);
@@ -470,8 +469,8 @@ function ArticlesEdit({ id }) {
                         </Dropdown>
                       </Form.Group>
                     </Col>
-
                     <Col lg={12}>
+                      {console.log(pageContent)}
                       <div className="mb-3">
                         <Form.Group>
                           <Form.Label className="blue_dark fw-medium">Enter Content</Form.Label>
@@ -482,9 +481,53 @@ function ArticlesEdit({ id }) {
                             init={{
                               menubar: false,
                               plugins:
-                                'anchor autolink charmap image link lists media searchreplace table visualblocks forecolor backcolor',
+                                'anchor autolink charmap image link lists searchreplace table visualblocks forecolor backcolor tinydrive',
                               toolbar:
                                 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | forecolor backcolor',
+                              image_title: true,
+                              automatic_uploads: false,
+                              file_picker_types: 'image',
+                              file_picker_callback: async (cb, value, meta) => {
+                                const input = document.createElement('input');
+                                input.setAttribute('type', 'file');
+                                input.setAttribute('accept', 'image/*');
+                                input.setAttribute('multiple', 'true');
+                                input.addEventListener('change', async (e) => {
+                                  const file = e.target.files[0];
+                                  const formData = new FormData();
+                                  formData.append('folderName', '/articles_content');
+                                  formData.append('files', file);
+                                  const headers = getHeaders();
+
+                                  try {
+                                    // Upload to S3
+                                    const s3Response = await axios.post(
+                                      `${process.env.BASE_API_URL}${process.env.PRESS_RELEASES_UPLOAD_FILE_DATA}`,
+                                      formData,
+                                      { headers }
+                                    );
+
+                                    // Assuming S3 response contains the S3 URL
+                                    const s3ImageUrl = process.env.IMAGE_BASE + s3Response.data.result[0];
+
+                                    // Include file name in alt attribute
+                                    const altText = file.name;
+
+                                    // Set the image directly with the S3 URL
+                                    const imgTag = `<img src="${s3ImageUrl}" alt="${altText}">`;
+
+                                    // Insert the image into the editor
+                                    tinymce.activeEditor.execCommand('mceInsertContent', false, imgTag);
+
+                                    // Invoke the callback with the S3 image URL and image title
+                                    cb(s3ImageUrl, { title: altText });
+                                  } catch (error) {
+                                    console.error('Error:', error);
+                                  }
+                                });
+
+                                input.click();
+                              },
                             }}
                           />
                           {formErrors.pageContent && <p className="text-danger fs_13 mt-1">{formErrors.pageContent}</p>}
